@@ -6,12 +6,17 @@ import aws.request.CostExplorer;
 import com.amazonaws.services.costexplorer.model.Dimension;
 import com.amazonaws.services.costexplorer.model.Metric;
 import singleton.DataStorage;
+import util.DateUtil;
 
 import java.time.LocalDate;
 
 public class AwsRequestHandler {
 
+    private CostExplorer costExplorer;
+
     public AwsRequestHandler() {
+
+        costExplorer = new CostExplorer();
     }
 
     public void MakeRequest(AwsRequest awsRequest) {
@@ -24,6 +29,8 @@ public class AwsRequestHandler {
             case MONTHLY_BUDGET:
                 MonthlyBudget();
                 break;
+            case COST_FORECAST:
+                CostForeCast();
 
         }
     }
@@ -31,17 +38,24 @@ public class AwsRequestHandler {
 
     private void TotalCostLinkedAccount() {
 
-        CostExplorer costExplorer = new CostExplorer();
 
-        costExplorer.CEWithDimension(Dimension.LINKED_ACCOUNT, DataStorage.getInstance().getAwsAccountNr(), Metric.UNBLENDED_COST,
-                LocalDate.of(2021,9,1), LocalDate.now());
+        costExplorer.CostAndUsages(Dimension.LINKED_ACCOUNT, DataStorage.getInstance().getAwsAccountNr(), Metric.UNBLENDED_COST,
+                LocalDate.of(2021, 9, 1), LocalDate.now());
 
     }
 
     private void MonthlyBudget() {
 
         Budget budget = new Budget();
-        budget.BudgetWithFilter(DataStorage.getInstance().getAwsAccountNr(),"Monthly budget");
+        budget.BudgetWithFilter(DataStorage.getInstance().getAwsAccountNr(), "Monthly budget");
+
+    }
+
+    private void CostForeCast() {
+
+
+        costExplorer.CostForeCast(Dimension.LINKED_ACCOUNT, "AWS",
+                LocalDate.now(), LocalDate.now().plusMonths(3));
 
     }
 

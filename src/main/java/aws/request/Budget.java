@@ -33,6 +33,7 @@ public class Budget extends AwsBase {
             System.out.println("Budget Limit -> "+awsBudgets.describeBudget(budgetsRequest).getBudget().getBudgetLimit());
             System.out.println("Budget Used -> "+awsBudgets.describeBudget(budgetsRequest).getBudget().getCalculatedSpend().getActualSpend());
 
+
         } catch (final Exception exception) {
 
             exception.printStackTrace();

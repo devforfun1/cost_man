@@ -16,21 +16,16 @@ public class PropUtil {
 
         FileInputStream fileInputStream = null;
 
-        try{
+        try {
 
 
-            fileInputStream = new FileInputStream(PROJECT_PATH+FILE_NAME);
+            fileInputStream = new FileInputStream(PROJECT_PATH + FILE_NAME);
             properties = new Properties();
             properties.load(fileInputStream);
-        }
-
-        catch (IOException ioException){
+        } catch (IOException ioException) {
 
             ioException.printStackTrace();
-        }
-
-
-        finally {
+        } finally {
             fileInputStream.close();
         }
 

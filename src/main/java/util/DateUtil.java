@@ -9,4 +9,12 @@ public class DateUtil {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         return ld.format(formatter);
     }
+
+    public static LocalDate GetLastDayInMonth(){
+
+       LocalDate current = LocalDate.now();
+
+
+        return LocalDate.of(current.getYear(),current.getMonth(),current.lengthOfMonth());
+    }
 }
