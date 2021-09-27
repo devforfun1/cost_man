@@ -9,6 +9,7 @@ import singleton.DataStorage;
 import util.DateUtil;
 
 import java.time.LocalDate;
+import java.time.Month;
 
 public class AwsRequestHandler {
 
@@ -19,12 +20,15 @@ public class AwsRequestHandler {
         costExplorer = new CostExplorer();
     }
 
-    public void MakeRequest(AwsRequest awsRequest) {
+    public void HandleRequest(AwsRequest awsRequest) {
 
 
         switch (awsRequest) {
-            case TOTAL_COST_LINKED_ACCOUNT:
-                TotalCostLinkedAccount();
+            case TOTAL_COST:
+                TotalCost();
+                break;
+            case TOTAL_COST_GROUP_BY:
+                TotalCostWithGroupBy();
                 break;
             case MONTHLY_BUDGET:
                 MonthlyBudget();
@@ -36,11 +40,20 @@ public class AwsRequestHandler {
     }
 
 
-    private void TotalCostLinkedAccount() {
+    private void TotalCost() {
 
 
         costExplorer.CostAndUsages(Dimension.LINKED_ACCOUNT, DataStorage.getInstance().getAwsAccountNr(), Metric.UNBLENDED_COST,
-                LocalDate.of(2021, 9, 1), LocalDate.now());
+                DateUtil.GetFirstDateOfCurrentMonth(), LocalDate.now());
+
+    }
+
+    private void TotalCostWithGroupBy(){
+
+
+
+
+     costExplorer.CostAndUsagesWithGroupBy(DateUtil.GetFirstDateOfCurrentMonth(),LocalDate.now());
 
     }
 

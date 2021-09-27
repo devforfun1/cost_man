@@ -6,7 +6,6 @@ import com.amazonaws.services.budgets.*;
 import com.amazonaws.services.budgets.AWSBudgetsClientBuilder;
 
 import com.amazonaws.services.budgets.model.DescribeBudgetRequest;
-import com.amazonaws.services.budgets.model.DescribeBudgetsRequest;
 import security.CredentialsClient;
 
 
@@ -15,6 +14,7 @@ public class Budget extends AwsBase {
 
     public Budget() {
     }
+
 
     public void BudgetWithFilter(String accountId, String budgetName) {
 
@@ -33,6 +33,8 @@ public class Budget extends AwsBase {
             System.out.println("Budget Limit -> "+awsBudgets.describeBudget(budgetsRequest).getBudget().getBudgetLimit());
             System.out.println("Budget Used -> "+awsBudgets.describeBudget(budgetsRequest).getBudget().getCalculatedSpend().getActualSpend());
 
+
+            awsBudgets.shutdown();
 
         } catch (final Exception exception) {
 

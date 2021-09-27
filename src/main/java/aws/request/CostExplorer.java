@@ -1,19 +1,26 @@
 package aws.request;
 
 import annonation.AwsRequest;
+import aws.handler.AwsResultHandler;
 import base.AwsBase;
 import com.amazonaws.services.costexplorer.AWSCostExplorer;
 import com.amazonaws.services.costexplorer.AWSCostExplorerClientBuilder;
 import com.amazonaws.services.costexplorer.model.*;
 import security.CredentialsClient;
+
 import util.DateUtil;
 
 import java.time.LocalDate;
 
+
 @AwsRequest
 public class CostExplorer extends AwsBase {
 
+    private AwsResultHandler resultHandler;
+
     public CostExplorer() {
+
+        resultHandler = new AwsResultHandler();
     }
 
     public void CostAndUsages(Dimension dimension, String value, Metric metric, LocalDate startDate, LocalDate endDate) {
@@ -46,6 +53,32 @@ public class CostExplorer extends AwsBase {
             System.out.println(e);
         }
     }
+
+    public void CostAndUsagesWithGroupBy(LocalDate startDate, LocalDate endDate) {
+        final GetCostAndUsageRequest awsCERequest = new GetCostAndUsageRequest()
+                .withTimePeriod(new DateInterval().withStart(DateUtil.ConvertDate(startDate)).withEnd(DateUtil.ConvertDate(endDate)))
+                .withGranularity(Granularity.MONTHLY)
+                .withMetrics(Metric.UNBLENDED_COST.name())
+                .withGroupBy(new GroupDefinition().withType("DIMENSION").withKey(Dimension.SERVICE.toString()));
+
+
+        try {
+            AWSCostExplorer ce = AWSCostExplorerClientBuilder.standard()
+                    .withCredentials(new CredentialsClient().getCredentials())
+                    .build();
+
+
+            GetCostAndUsageResult ceResult = ce.getCostAndUsage(awsCERequest);
+
+
+            resultHandler.CostAndUsagesWithGroupByResult(ceResult);
+
+
+        } catch (final Exception e) {
+            System.out.println(e);
+        }
+    }
+
 
     public void CostForeCast(Dimension dimension, String value, LocalDate startDate, LocalDate endDate) {
         com.amazonaws.services.costexplorer.model.Expression expression = new com.amazonaws.services.costexplorer.model.Expression();

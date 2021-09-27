@@ -14,7 +14,7 @@ public class Main {
 
         AwsRequestHandler awsRequestHandler = new AwsRequestHandler();
 
-        awsRequestHandler.MakeRequest(AwsRequest.MONTHLY_BUDGET);
+        awsRequestHandler.HandleRequest(AwsRequest.TOTAL_COST_GROUP_BY);
 
     }
 
