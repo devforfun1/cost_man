@@ -4,6 +4,7 @@ import Enum.AwsRequest;
 import aws.handler.AwsRequestHandler;
 
 
+
 public class Main {
 
     public static void main(String args[]) {
@@ -12,9 +13,10 @@ public class Main {
         Init.Start();
 
 
+
         AwsRequestHandler awsRequestHandler = new AwsRequestHandler();
 
-        awsRequestHandler.HandleRequest(AwsRequest.TOTAL_COST_GROUP_BY);
+        awsRequestHandler.HandleRequest(AwsRequest.COST_EXPLORER_JSON_DATA);
 
     }
 

@@ -4,16 +4,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 
+import java.util.List;
 
-
-        import java.util.List;
-
-        import com.fasterxml.jackson.annotation.JsonAnyGetter;
-        import com.fasterxml.jackson.annotation.JsonAnySetter;
-        import com.fasterxml.jackson.annotation.JsonIgnore;
-        import com.fasterxml.jackson.annotation.JsonInclude;
-        import com.fasterxml.jackson.annotation.JsonProperty;
-        import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
+import com.fasterxml.jackson.annotation.JsonAnySetter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import json.model.cost_and_usages.sub.GroupDefinition;
 import json.model.cost_and_usages.sub.ResultsByTime;
 
@@ -75,4 +73,13 @@ public class CostAndUsagesJson {
         this.additionalProperties.put(name, value);
     }
 
+    @Override
+    public String toString() {
+        return "CostAndUsagesJson{" +
+                "dimensionValueAttributes=" + dimensionValueAttributes +
+                ", groupDefinitions=" + groupDefinitions +
+                ", resultsByTime=" + resultsByTime +
+                ", additionalProperties=" + additionalProperties +
+                '}';
+    }
 }

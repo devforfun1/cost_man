@@ -10,7 +10,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import software.amazon.awssdk.services.guardduty.model.Total;
+import json.model.cost_and_usages.sub.Total;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
@@ -83,5 +83,15 @@ public class ResultsByTime {
         this.additionalProperties.put(name, value);
     }
 
+    @Override
+    public String toString() {
+        return "ResultsByTime{" +
+                "estimated=" + estimated +
+                ", groups=" + groups +
+                ", timePeriod=" + timePeriod +
+                ", total=" + total +
+                ", additionalProperties=" + additionalProperties +
+                '}';
+    }
 }
 

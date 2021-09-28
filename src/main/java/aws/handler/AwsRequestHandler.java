@@ -1,6 +1,7 @@
 package aws.handler;
 
 import Enum.AwsRequest;
+import aws.json_api_gateway_caller.Runner;
 import aws.request.Budget;
 import aws.request.CostExplorer;
 import com.amazonaws.services.costexplorer.model.Dimension;
@@ -9,7 +10,7 @@ import singleton.DataStorage;
 import util.DateUtil;
 
 import java.time.LocalDate;
-import java.time.Month;
+
 
 public class AwsRequestHandler {
 
@@ -35,6 +36,9 @@ public class AwsRequestHandler {
                 break;
             case COST_FORECAST:
                 CostForeCast();
+                break;
+            case COST_EXPLORER_JSON_DATA:
+                CostExplorerJsonData();
 
         }
     }
@@ -48,12 +52,10 @@ public class AwsRequestHandler {
 
     }
 
-    private void TotalCostWithGroupBy(){
+    private void TotalCostWithGroupBy() {
 
 
-
-
-     costExplorer.CostAndUsagesWithGroupBy(DateUtil.GetFirstDateOfCurrentMonth(),LocalDate.now());
+        costExplorer.CostAndUsagesWithGroupBy(DateUtil.GetFirstDateOfCurrentMonth(), LocalDate.now());
 
     }
 
@@ -69,6 +71,14 @@ public class AwsRequestHandler {
 
         costExplorer.CostForeCast(Dimension.LINKED_ACCOUNT, "AWS",
                 LocalDate.now(), LocalDate.now().plusMonths(3));
+
+    }
+
+    private void CostExplorerJsonData() {
+
+        Runner runner = new Runner();
+
+        runner.MakeRequest();
 
     }
 
