@@ -6,6 +6,7 @@ public class DataStorage {
 
     private String awsAccountNr;
     private String roleArn;
+    private String budgetName;
 
     private DataStorage() {}
 
@@ -33,5 +34,13 @@ public class DataStorage {
 
     public void setRoleArn(String roleArn) {
         this.roleArn = roleArn;
+    }
+
+    public String getBudgetName() {
+        return budgetName;
+    }
+
+    public void setBudgetName(String budgetName) {
+        this.budgetName = budgetName;
     }
 }

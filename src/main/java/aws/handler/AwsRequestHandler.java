@@ -68,7 +68,7 @@ public class AwsRequestHandler {
     private void MonthlyBudget() {
 
         BudgetRequest budget = new BudgetRequest();
-        budget.BudgetWithFilter(DataStorage.getInstance().getAwsAccountNr(), "Monthly budget");
+        budget.BudgetWithFilter(DataStorage.getInstance().getAwsAccountNr(), DataStorage.getInstance().getBudgetName());
 
     }
 

@@ -1,23 +1,24 @@
 package model;
 
+import base.ResponseBase;
 import util.DateUtil;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 
-public class BudgetResponse {
+public class BudgetResponse extends ResponseBase {
 
     private BigDecimal amountUsed;
     private BigDecimal limit;
     private String unit;
-    private LocalDateTime ldt;
 
 
-    public BudgetResponse(BigDecimal amountUsed, BigDecimal limit, String unit, LocalDateTime ld) {
+    public BudgetResponse(LocalDateTime ldt, BigDecimal amountUsed, BigDecimal limit, String unit) {
+        super(ldt);
         this.amountUsed = amountUsed;
         this.limit = limit;
         this.unit = unit;
-        this.ldt = ld;
     }
 
     public BigDecimal getAmountUsed() {
@@ -32,22 +33,26 @@ public class BudgetResponse {
         return unit;
     }
 
-    public LocalDateTime getLdt() {
-        return ldt;
-    }
+
 
     public boolean IsBudgetOverDue(){
 
      return amountUsed.compareTo(limit) > 0;
     }
 
+    public Integer GetPercentageLeft(){
+
+     return amountUsed.divide(limit, RoundingMode.HALF_UP).intValue();
+    }
+
+
     @Override
     public String toString() {
         return "BudgetResponse{" +
-                "amountUsed=" + amountUsed +
+                "ldt=" + ldt +
+                ", amountUsed=" + amountUsed +
                 ", limit=" + limit +
                 ", unit='" + unit + '\'' +
-                ", ldt=" + DateUtil.ConvertDateTime(ldt) +
                 '}';
     }
 }

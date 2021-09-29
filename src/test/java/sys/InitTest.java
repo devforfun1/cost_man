@@ -101,4 +101,16 @@ public class InitTest {
         Assert.assertEquals(expected,actual);
 
     }
+
+    @Test
+    public void KeyExists_BudgetName_Test(){
+
+        final boolean expected = true;
+        boolean actual;
+
+        actual = props.containsKey("BUDGET_NAME");
+
+        Assert.assertEquals(expected,actual);
+
+    }
 }

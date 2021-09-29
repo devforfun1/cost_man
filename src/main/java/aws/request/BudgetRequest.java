@@ -2,7 +2,7 @@ package aws.request;
 
 import annonation.AwsRequest;
 import aws.handler.budget.BudgetResponseHandler;
-import base.AwsBase;
+import base.RequestBase;
 import com.amazonaws.services.budgets.*;
 import com.amazonaws.services.budgets.AWSBudgetsClientBuilder;
 
@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 
 
 @AwsRequest
-public class BudgetRequest extends AwsBase {
+public class BudgetRequest extends RequestBase {
 
     BudgetResponseHandler handler;
 
@@ -41,10 +41,11 @@ public class BudgetRequest extends AwsBase {
             Budget budget = awsBudgets.describeBudget(budgetsRequest).getBudget();
 
 
-            BudgetResponse response = new BudgetResponse(budget.getCalculatedSpend().getActualSpend().getAmount(),
+            BudgetResponse response = new BudgetResponse(LocalDateTime.now(),
+                    budget.getCalculatedSpend().getActualSpend().getAmount(),
                     budget.getBudgetLimit().getAmount(),
-                    budget.getBudgetLimit().getUnit(),
-                    LocalDateTime.now());
+                    budget.getBudgetLimit().getUnit());
+
 
             awsBudgets.shutdown();
 

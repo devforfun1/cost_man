@@ -1,8 +1,7 @@
 package aws.request;
 
 import annonation.AwsRequest;
-import aws.handler.AwsResultHandler;
-import base.AwsBase;
+import base.RequestBase;
 import com.amazonaws.services.costexplorer.AWSCostExplorer;
 import com.amazonaws.services.costexplorer.AWSCostExplorerClientBuilder;
 import com.amazonaws.services.costexplorer.model.*;
@@ -14,7 +13,7 @@ import java.time.LocalDate;
 
 
 @AwsRequest
-public class CostExplorerRequest extends AwsBase {
+public class CostExplorerRequest extends RequestBase {
 
 
     public CostExplorerRequest() {

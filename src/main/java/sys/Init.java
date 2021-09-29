@@ -14,6 +14,7 @@ public class Init {
             Properties props = PropUtil.ReadPropertiesFile();
             DataStorage.getInstance().setAwsAccountNr(props.getProperty(PropertiesKey.ACCOUNT_ID.toString()));
             DataStorage.getInstance().setRoleArn(props.getProperty(PropertiesKey.ROLE_ARN.toString()));
+            DataStorage.getInstance().setBudgetName(props.getProperty(PropertiesKey.BUDGET_NAME.toString()));
         } catch (IOException e) {
             e.printStackTrace();
         }
