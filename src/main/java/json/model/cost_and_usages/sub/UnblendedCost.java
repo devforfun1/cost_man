@@ -55,5 +55,10 @@ public class UnblendedCost {
         this.additionalProperties.put(name, value);
     }
 
+    public Double GetAmountDoubleValue(){
+
+        return Double.parseDouble(amount);
+    }
+
 }
 

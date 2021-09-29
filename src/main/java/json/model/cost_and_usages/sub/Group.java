@@ -19,7 +19,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
             "Metrics"
     })
 
-    public class Group {
+    public class Group  {
 
         @JsonProperty("Keys")
         private List<String> keys = null;
