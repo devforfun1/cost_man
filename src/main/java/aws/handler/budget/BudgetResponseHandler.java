@@ -13,7 +13,9 @@ public class BudgetResponseHandler extends ResponseHandlerBase {
 
         System.out.println(response.toString());
 
-        BudgetStatus status = GetBudgetStatus(response.GetPercentageLeft());
+        BudgetStatus status = GetBudgetStatus(response);
+
+        System.out.println(status);
 
         switch (status) {
             case OK:
@@ -22,9 +24,11 @@ public class BudgetResponseHandler extends ResponseHandlerBase {
             case CLOSE_TO_LIMIT:
                 BudgetCloseToLimit(response);
                 break;
-            case URGENT: BudgetUrgent(response);
+            case URGENT:
+                BudgetUrgent(response);
                 break;
-            case OVER_DUE: BudgetOverDue(response);
+            case OVER_DUE:
+                BudgetOverDue(response);
         }
 
     }
@@ -47,20 +51,30 @@ public class BudgetResponseHandler extends ResponseHandlerBase {
 
     }
 
-    private BudgetStatus GetBudgetStatus(int percentage) {
+    private BudgetStatus GetBudgetStatus(BudgetResponse response) {
 
-        if (percentage >= 0 && percentage <= 70) {
+        BudgetStatus budgetStatus = BudgetStatus.NOT_DEFINED;
 
-            return BudgetStatus.OK;
-        } else if (percentage > 70 && percentage <= 89) {
+        System.out.println(response.GetPercentageLeft());
 
-            return BudgetStatus.CLOSE_TO_LIMIT;
-        } else if (percentage >= 90 && percentage <= 100) {
+        double percentage = response.GetPercentageLeft();
 
-            return BudgetStatus.URGENT;
-        } else
-            return BudgetStatus.OVER_DUE;
+        if (response.IsBudgetOverDue()) {
+            budgetStatus = BudgetStatus.OVER_DUE;
+        } else {
+            if (percentage >= 0 && percentage <= 0.70) {
 
+                budgetStatus = BudgetStatus.OK;
+            } else if (percentage > 0.70 && percentage <= 0.89) {
 
+                budgetStatus = BudgetStatus.CLOSE_TO_LIMIT;
+            } else if (percentage >= 0.90 && percentage <= 1) {
+
+                budgetStatus = BudgetStatus.URGENT;
+            }
+
+        }
+
+        return budgetStatus;
     }
 }

@@ -40,9 +40,9 @@ public class BudgetResponse extends ResponseBase {
      return amountUsed.compareTo(limit) > 0;
     }
 
-    public Integer GetPercentageLeft(){
+    public Double GetPercentageLeft(){
 
-     return amountUsed.divide(limit, RoundingMode.HALF_UP).intValue();
+     return amountUsed.divide(limit, RoundingMode.HALF_UP).doubleValue();
     }
 
 
