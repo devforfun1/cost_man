@@ -14,13 +14,12 @@ import java.time.LocalDate;
 
 
 @AwsRequest
-public class CostExplorer extends AwsBase {
+public class CostExplorerRequest extends AwsBase {
 
-    private AwsResultHandler resultHandler;
 
-    public CostExplorer() {
+    public CostExplorerRequest() {
 
-        resultHandler = new AwsResultHandler();
+
     }
 
     public void CostAndUsages(Dimension dimension, String value, Metric metric, LocalDate startDate, LocalDate endDate) {
@@ -48,13 +47,14 @@ public class CostExplorer extends AwsBase {
             GetCostAndUsageResult res = ce.getCostAndUsage(awsCERequest);
             System.out.println(res.getResultsByTime());
 
+            ce.shutdown();
 
         } catch (final Exception e) {
             System.out.println(e);
         }
     }
 
-    public void CostAndUsagesWithGroupBy(LocalDate startDate, LocalDate endDate) {
+    public GetCostAndUsageResult CostAndUsagesWithGroupBy(LocalDate startDate, LocalDate endDate) {
         final GetCostAndUsageRequest awsCERequest = new GetCostAndUsageRequest()
                 .withTimePeriod(new DateInterval().withStart(DateUtil.ConvertDate(startDate)).withEnd(DateUtil.ConvertDate(endDate)))
                 .withGranularity(Granularity.MONTHLY)
@@ -70,13 +70,16 @@ public class CostExplorer extends AwsBase {
 
             GetCostAndUsageResult ceResult = ce.getCostAndUsage(awsCERequest);
 
+            ce.shutdown();
 
-            resultHandler.CostAndUsagesWithGroupByResult(ceResult);
+            return ceResult;
 
 
         } catch (final Exception e) {
             System.out.println(e);
         }
+
+        return new GetCostAndUsageResult();
     }
 
 

@@ -58,7 +58,7 @@ public class InitTest {
     }
 
     @Test
-    public void StartsWith_roleArn_Test() {
+    public void StartsWith_RoleArn_Test() {
 
         final String expected = "arn:aws:iam::";
         String actual = roleArn.substring(0, 13);
@@ -77,5 +77,28 @@ public class InitTest {
         actual = accountNrFromRoleArn.matches(accountId);
 
         Assert.assertEquals(expected, actual);
+    }
+
+    @Test
+    public void KeyExists_AccountId_Test(){
+
+        final boolean expected = true;
+        boolean actual;
+
+       actual = props.containsKey("ACCOUNT_ID");
+
+       Assert.assertEquals(expected,actual);
+    }
+
+    @Test
+    public void KeyExists_RoleArn_Test(){
+
+        final boolean expected = true;
+        boolean actual;
+
+        actual = props.containsKey("ROLE_ARN");
+
+        Assert.assertEquals(expected,actual);
+
     }
 }

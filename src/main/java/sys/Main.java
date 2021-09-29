@@ -15,7 +15,7 @@ public class Main {
 
         AwsRequestHandler awsRequestHandler = new AwsRequestHandler();
 
-        awsRequestHandler.HandleRequest(AwsRequest.COST_EXPLORER_JSON_DATA);
+        awsRequestHandler.HandleRequest(AwsRequest.MONTHLY_BUDGET);
 
     }
 

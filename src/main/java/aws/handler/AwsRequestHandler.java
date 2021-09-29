@@ -2,10 +2,12 @@ package aws.handler;
 
 import Enum.AwsRequest;
 import aws.json_api_gateway_caller.Runner;
-import aws.request.Budget;
-import aws.request.CostExplorer;
+import aws.request.BudgetRequest;
+import aws.request.CostExplorerRequest;
 import com.amazonaws.services.costexplorer.model.Dimension;
+import com.amazonaws.services.costexplorer.model.GetCostAndUsageResult;
 import com.amazonaws.services.costexplorer.model.Metric;
+import json.model.cost_and_usages.CostAndUsagesJson;
 import singleton.DataStorage;
 import util.DateUtil;
 
@@ -14,11 +16,15 @@ import java.time.LocalDate;
 
 public class AwsRequestHandler {
 
-    private CostExplorer costExplorer;
+    private AwsResultHandler resultHandler;
+
+
+    private CostExplorerRequest costExplorerRequest;
 
     public AwsRequestHandler() {
 
-        costExplorer = new CostExplorer();
+        resultHandler = new AwsResultHandler();
+        costExplorerRequest = new CostExplorerRequest();
     }
 
     public void HandleRequest(AwsRequest awsRequest) {
@@ -47,21 +53,21 @@ public class AwsRequestHandler {
     private void TotalCost() {
 
 
-        costExplorer.CostAndUsages(Dimension.LINKED_ACCOUNT, DataStorage.getInstance().getAwsAccountNr(), Metric.UNBLENDED_COST,
+        costExplorerRequest.CostAndUsages(Dimension.LINKED_ACCOUNT, DataStorage.getInstance().getAwsAccountNr(), Metric.UNBLENDED_COST,
                 DateUtil.GetFirstDateOfCurrentMonth(), LocalDate.now());
 
     }
 
     private void TotalCostWithGroupBy() {
 
+        GetCostAndUsageResult ceResult = costExplorerRequest.CostAndUsagesWithGroupBy(DateUtil.GetFirstDateOfCurrentMonth(), LocalDate.now());
 
-        costExplorer.CostAndUsagesWithGroupBy(DateUtil.GetFirstDateOfCurrentMonth(), LocalDate.now());
-
+        resultHandler.CostAndUsagesWithGroupByResult(ceResult);
     }
 
     private void MonthlyBudget() {
 
-        Budget budget = new Budget();
+        BudgetRequest budget = new BudgetRequest();
         budget.BudgetWithFilter(DataStorage.getInstance().getAwsAccountNr(), "Monthly budget");
 
     }
@@ -69,7 +75,7 @@ public class AwsRequestHandler {
     private void CostForeCast() {
 
 
-        costExplorer.CostForeCast(Dimension.LINKED_ACCOUNT, "AWS",
+        costExplorerRequest.CostForeCast(Dimension.LINKED_ACCOUNT, "AWS",
                 LocalDate.now(), LocalDate.now().plusMonths(3));
 
     }
@@ -78,7 +84,9 @@ public class AwsRequestHandler {
 
         Runner runner = new Runner();
 
-        runner.MakeRequest();
+        CostAndUsagesJson result = runner.MakeRequest();
+
+        resultHandler.CostAndUsagesJsonResult(result);
 
     }
 

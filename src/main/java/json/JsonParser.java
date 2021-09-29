@@ -12,20 +12,17 @@ public class JsonParser {
     public JsonParser() {
     }
 
-    public CostAndUsagesJson ParseCostAndUsageString(String jsonResponse){
-
-        CostAndUsagesJson costAndUsages = null;
+    public CostAndUsagesJson ParseCostAndUsageString(String jsonResponse) {
 
         ObjectMapper objectMapper = new ObjectMapper();
 
         try {
-            costAndUsages = objectMapper.readValue(jsonResponse, new TypeReference<CostAndUsagesJson>() {});
+            return objectMapper.readValue(jsonResponse, new TypeReference<CostAndUsagesJson>() {
+            });
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
 
-       costAndUsages.getResultsByTime().forEach(r -> r.getGroups().forEach(g -> System.out.println(g.getKeys().toString() +g.getMetrics().getUnblendedCost().getAmount().toString())));
-
-        return null;
+        return new CostAndUsagesJson();
     }
 }
