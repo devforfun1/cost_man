@@ -1,21 +1,21 @@
-package aws.handler;
+package handler.response.cost_explorer;
 
 
+import base.ResponseHandlerBase;
 import com.amazonaws.services.costexplorer.model.GetCostAndUsageResult;
 import json.model.cost_and_usages.CostAndUsagesJson;
 import json.model.cost_and_usages.sub.Group;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class AwsResultHandler {
 
-    public AwsResultHandler() {
+public class CostExplorerResponseHandler extends ResponseHandlerBase {
+
+    public CostExplorerResponseHandler() {
     }
-
 
     public void CostAndUsagesWithGroupByResult(GetCostAndUsageResult result) {
 
@@ -33,13 +33,12 @@ public class AwsResultHandler {
                         .forEach(g -> groupList.add(g)));
 
 
-
         Collections.sort(groupList, (o1, o2) -> o2.getMetrics().getUnblendedCost().GetAmountDoubleValue().compareTo(o1.getMetrics().getUnblendedCost().GetAmountDoubleValue()));
 
         groupList.forEach(g -> System.out.println(g.getKeys().toString() + g.getMetrics().getUnblendedCost().getAmount().toString()));
 
 
-       Double totalValue = groupList.stream().collect(Collectors.summarizingDouble(g -> g.getMetrics().getUnblendedCost().GetAmountDoubleValue())).getSum();
+        Double totalValue = groupList.stream().collect(Collectors.summarizingDouble(g -> g.getMetrics().getUnblendedCost().GetAmountDoubleValue())).getSum();
 
         System.out.println("Total amount -> " + totalValue + "$");
     }

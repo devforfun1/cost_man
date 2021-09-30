@@ -1,13 +1,10 @@
-package aws.handler;
+package handler;
 
 import Enum.AwsRequest;
-import aws.json_api_gateway_caller.Runner;
-import aws.request.BudgetRequest;
-import aws.request.CostExplorerRequest;
+import aws.request.budget.BudgetRequest;
+import aws.request.cost_explorer.CostExplorerRequest;
 import com.amazonaws.services.costexplorer.model.Dimension;
-import com.amazonaws.services.costexplorer.model.GetCostAndUsageResult;
 import com.amazonaws.services.costexplorer.model.Metric;
-import json.model.cost_and_usages.CostAndUsagesJson;
 import singleton.DataStorage;
 import util.DateUtil;
 
@@ -16,14 +13,12 @@ import java.time.LocalDate;
 
 public class AwsRequestHandler {
 
-    private AwsResultHandler resultHandler;
 
-
-    private CostExplorerRequest costExplorerRequest;
+    private final CostExplorerRequest costExplorerRequest;
 
     public AwsRequestHandler() {
 
-        resultHandler = new AwsResultHandler();
+
         costExplorerRequest = new CostExplorerRequest();
     }
 
@@ -60,15 +55,15 @@ public class AwsRequestHandler {
 
     private void TotalCostWithGroupBy() {
 
-        GetCostAndUsageResult ceResult = costExplorerRequest.CostAndUsagesWithGroupBy(DateUtil.GetFirstDateOfCurrentMonth(), LocalDate.now());
+        costExplorerRequest.CostAndUsagesWithGroupBy(DateUtil.GetFirstDateOfCurrentMonth(), LocalDate.now());
 
-        resultHandler.CostAndUsagesWithGroupByResult(ceResult);
+
     }
 
     private void MonthlyBudget() {
 
-        BudgetRequest budget = new BudgetRequest();
-        budget.BudgetWithFilter(DataStorage.getInstance().getAwsAccountNr(), DataStorage.getInstance().getBudgetName());
+        BudgetRequest budgetRequest = new BudgetRequest();
+        budgetRequest.BudgetWithFilter(DataStorage.getInstance().getAwsAccountNr(), DataStorage.getInstance().getBudgetName());
 
     }
 
@@ -82,11 +77,7 @@ public class AwsRequestHandler {
 
     private void CostExplorerJsonData() {
 
-        Runner runner = new Runner();
-
-        CostAndUsagesJson result = runner.MakeRequest();
-
-        resultHandler.CostAndUsagesJsonResult(result);
+        costExplorerRequest.CostExplorerJsonData();
 
     }
 

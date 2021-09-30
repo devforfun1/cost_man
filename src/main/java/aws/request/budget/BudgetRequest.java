@@ -1,7 +1,7 @@
-package aws.request;
+package aws.request.budget;
 
 import annonation.AwsRequest;
-import aws.handler.budget.BudgetResponseHandler;
+import handler.response.budget.BudgetResponseHandler;
 import base.RequestBase;
 import com.amazonaws.services.budgets.*;
 import com.amazonaws.services.budgets.AWSBudgetsClientBuilder;
@@ -15,9 +15,9 @@ import java.time.LocalDateTime;
 
 
 @AwsRequest
-public class BudgetRequest extends RequestBase {
+public class BudgetRequest extends RequestBase<BudgetResponseHandler> {
 
-    BudgetResponseHandler handler;
+
 
     public BudgetRequest() {
 

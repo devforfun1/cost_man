@@ -1,10 +1,13 @@
-package aws.request;
+package aws.request.cost_explorer;
 
 import annonation.AwsRequest;
+import handler.response.cost_explorer.CostExplorerResponseHandler;
+import aws.json_api_gateway_caller.Runner;
 import base.RequestBase;
 import com.amazonaws.services.costexplorer.AWSCostExplorer;
 import com.amazonaws.services.costexplorer.AWSCostExplorerClientBuilder;
 import com.amazonaws.services.costexplorer.model.*;
+import json.model.cost_and_usages.CostAndUsagesJson;
 import security.CredentialsClient;
 
 import util.DateUtil;
@@ -13,11 +16,12 @@ import java.time.LocalDate;
 
 
 @AwsRequest
-public class CostExplorerRequest extends RequestBase {
+public class CostExplorerRequest extends RequestBase<CostExplorerResponseHandler> {
 
 
     public CostExplorerRequest() {
 
+        handler = new CostExplorerResponseHandler();
 
     }
 
@@ -53,7 +57,7 @@ public class CostExplorerRequest extends RequestBase {
         }
     }
 
-    public GetCostAndUsageResult CostAndUsagesWithGroupBy(LocalDate startDate, LocalDate endDate) {
+    public boolean CostAndUsagesWithGroupBy(LocalDate startDate, LocalDate endDate) {
         final GetCostAndUsageRequest awsCERequest = new GetCostAndUsageRequest()
                 .withTimePeriod(new DateInterval().withStart(DateUtil.ConvertDate(startDate)).withEnd(DateUtil.ConvertDate(endDate)))
                 .withGranularity(Granularity.MONTHLY)
@@ -69,16 +73,18 @@ public class CostExplorerRequest extends RequestBase {
 
             GetCostAndUsageResult ceResult = ce.getCostAndUsage(awsCERequest);
 
+            handler.CostAndUsagesWithGroupByResult(ceResult);
+
             ce.shutdown();
 
-            return ceResult;
+            return true;
 
 
         } catch (final Exception e) {
             System.out.println(e);
         }
 
-        return new GetCostAndUsageResult();
+        return false;
     }
 
 
@@ -113,5 +119,14 @@ public class CostExplorerRequest extends RequestBase {
         }
     }
 
+    public void CostExplorerJsonData() {
+
+        Runner runner = new Runner();
+
+        CostAndUsagesJson result = runner.MakeRequest();
+
+        handler.CostAndUsagesJsonResult(result);
+
+    }
 
 }

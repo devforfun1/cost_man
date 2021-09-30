@@ -1,4 +1,4 @@
-package aws.handler.budget;
+package handler.response.budget;
 
 import base.ResponseHandlerBase;
 import model.BudgetResponse;
