@@ -1,5 +1,6 @@
 package json.model.cost_and_usages.sub;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -16,7 +17,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
         "Unit"
 })
 
-public class UnblendedCost {
+public class UnblendedCost implements Serializable {
 
     @JsonProperty("Amount")
     private String amount;

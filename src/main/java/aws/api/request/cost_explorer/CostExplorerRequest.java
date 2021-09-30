@@ -1,8 +1,8 @@
-package aws.request.cost_explorer;
+package aws.api.request.cost_explorer;
 
 import annonation.AwsRequest;
 import handler.response.cost_explorer.CostExplorerResponseHandler;
-import aws.json_api_gateway_caller.Runner;
+import aws.api.json_api_gateway_caller.Runner;
 import base.RequestBase;
 import com.amazonaws.services.costexplorer.AWSCostExplorer;
 import com.amazonaws.services.costexplorer.AWSCostExplorerClientBuilder;

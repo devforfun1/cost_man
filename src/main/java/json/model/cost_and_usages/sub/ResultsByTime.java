@@ -1,5 +1,6 @@
 package json.model.cost_and_usages.sub;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,7 +21,7 @@ import json.model.cost_and_usages.sub.Total;
         "Total"
 })
 
-public class ResultsByTime {
+public class ResultsByTime implements Serializable {
 
     @JsonProperty("Estimated")
     private Boolean estimated;

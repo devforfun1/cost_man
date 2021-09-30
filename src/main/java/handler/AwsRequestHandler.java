@@ -1,8 +1,9 @@
 package handler;
 
 import Enum.AwsRequest;
-import aws.request.budget.BudgetRequest;
-import aws.request.cost_explorer.CostExplorerRequest;
+import aws.api.request.budget.BudgetRequest;
+import aws.api.request.cost_explorer.CostExplorerRequest;
+import aws.cli.AwsCLIRequest;
 import com.amazonaws.services.costexplorer.model.Dimension;
 import com.amazonaws.services.costexplorer.model.Metric;
 import singleton.DataStorage;
@@ -15,11 +16,13 @@ public class AwsRequestHandler {
 
 
     private final CostExplorerRequest costExplorerRequest;
+    private final AwsCLIRequest awsCLIRequest;
 
     public AwsRequestHandler() {
 
 
         costExplorerRequest = new CostExplorerRequest();
+        awsCLIRequest = new AwsCLIRequest();
     }
 
     public void HandleRequest(AwsRequest awsRequest) {
@@ -40,6 +43,9 @@ public class AwsRequestHandler {
                 break;
             case COST_EXPLORER_JSON_DATA:
                 CostExplorerJsonData();
+                break;
+            case EC2_DATA:
+                GetEC2Data();
 
         }
     }
@@ -82,4 +88,9 @@ public class AwsRequestHandler {
     }
 
 
+    private void GetEC2Data() {
+
+        awsCLIRequest.GetEC2Data();
+
+    }
 }

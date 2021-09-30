@@ -1,11 +1,14 @@
 package json.model.cost_and_usages;
 
+import java.io.Serializable;
+import java.lang.annotation.Annotation;
 import java.util.HashMap;
 import java.util.Map;
 
 
 import java.util.List;
 
+import annonation.TopJSON;
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -21,8 +24,8 @@ import json.model.cost_and_usages.sub.ResultsByTime;
         "GroupDefinitions",
         "ResultsByTime"
 })
-
-public class CostAndUsagesJson {
+@TopJSON
+public class CostAndUsagesJson implements Serializable{
 
     @JsonProperty("DimensionValueAttributes")
     private List<Object> dimensionValueAttributes = null;
@@ -82,4 +85,6 @@ public class CostAndUsagesJson {
                 ", additionalProperties=" + additionalProperties +
                 '}';
     }
+
+
 }

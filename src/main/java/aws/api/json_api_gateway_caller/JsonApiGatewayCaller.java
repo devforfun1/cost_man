@@ -1,4 +1,4 @@
-package aws.json_api_gateway_caller;
+package aws.api.json_api_gateway_caller;
 
 import com.amazonaws.AmazonServiceException;
 import com.amazonaws.AmazonWebServiceClient;
@@ -7,8 +7,6 @@ import com.amazonaws.DefaultRequest;
 import com.amazonaws.RequestConfig;
 import com.amazonaws.auth.AWS4Signer;
 import com.amazonaws.auth.AWSCredentialsProvider;
-import com.amazonaws.auth.AWSStaticCredentialsProvider;
-import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.http.ExecutionContext;
 import com.amazonaws.http.HttpMethodName;
 import com.amazonaws.http.JsonErrorResponseHandler;
@@ -23,8 +21,6 @@ import com.amazonaws.transform.Unmarshaller;
 import com.fasterxml.jackson.databind.JsonNode;
 
 
-import aws.json_api_gateway_caller.ApiGatewayException;
-import aws.json_api_gateway_caller.ApiGatewayResponse;
 import security.CredentialsClient;
 
 import java.io.InputStream;

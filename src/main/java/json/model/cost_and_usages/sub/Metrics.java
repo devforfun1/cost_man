@@ -1,5 +1,6 @@
 package json.model.cost_and_usages.sub;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -17,7 +18,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
         "UsageQuantity"
 })
 
-public class Metrics {
+public class Metrics implements Serializable {
 
     @JsonProperty("BlendedCost")
     private BlendedCost blendedCost;

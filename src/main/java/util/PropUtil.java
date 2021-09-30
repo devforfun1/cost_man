@@ -5,10 +5,11 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Properties;
 
+import static sys.ProjectPaths.PROPERTIES_FILE_NAME;
+import static sys.ProjectPaths.RESOURCES_PATH;
+
 public class PropUtil {
 
-    private static final String FILE_NAME = "prop.properties";
-    private static final String PROJECT_PATH = "src/main/resources/";
 
     public static Properties ReadPropertiesFile() throws IOException {
 
@@ -19,7 +20,7 @@ public class PropUtil {
         try {
 
 
-            fileInputStream = new FileInputStream(PROJECT_PATH + FILE_NAME);
+            fileInputStream = new FileInputStream(RESOURCES_PATH + PROPERTIES_FILE_NAME);
             properties = new Properties();
             properties.load(fileInputStream);
         } catch (IOException ioException) {

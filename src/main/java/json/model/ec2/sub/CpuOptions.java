@@ -1,6 +1,5 @@
-package json.model.cost_and_usages.sub;
 
-
+package json.model.ec2.sub;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
@@ -14,37 +13,39 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
-        "Amount",
-        "Unit"
+    "CoreCount",
+    "ThreadsPerCore"
 })
 
-public class UsageQuantity implements Serializable {
+public class CpuOptions implements Serializable
+{
 
-    @JsonProperty("Amount")
-    private String amount;
-    @JsonProperty("Unit")
-    private String unit;
+    @JsonProperty("CoreCount")
+    private Integer coreCount;
+    @JsonProperty("ThreadsPerCore")
+    private Integer threadsPerCore;
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
+    private final static long serialVersionUID = -5584578282740827167L;
 
-    @JsonProperty("Amount")
-    public String getAmount() {
-        return amount;
+    @JsonProperty("CoreCount")
+    public Integer getCoreCount() {
+        return coreCount;
     }
 
-    @JsonProperty("Amount")
-    public void setAmount(String amount) {
-        this.amount = amount;
+    @JsonProperty("CoreCount")
+    public void setCoreCount(Integer coreCount) {
+        this.coreCount = coreCount;
     }
 
-    @JsonProperty("Unit")
-    public String getUnit() {
-        return unit;
+    @JsonProperty("ThreadsPerCore")
+    public Integer getThreadsPerCore() {
+        return threadsPerCore;
     }
 
-    @JsonProperty("Unit")
-    public void setUnit(String unit) {
-        this.unit = unit;
+    @JsonProperty("ThreadsPerCore")
+    public void setThreadsPerCore(Integer threadsPerCore) {
+        this.threadsPerCore = threadsPerCore;
     }
 
     @JsonAnyGetter

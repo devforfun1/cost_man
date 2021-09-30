@@ -1,4 +1,4 @@
-package aws.request.budget;
+package aws.api.request.budget;
 
 import annonation.AwsRequest;
 import handler.response.budget.BudgetResponseHandler;

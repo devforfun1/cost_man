@@ -1,5 +1,6 @@
 package json.model.cost_and_usages.sub;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -19,7 +20,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
             "Metrics"
     })
 
-    public class Group  {
+    public class Group implements Serializable {
 
         @JsonProperty("Keys")
         private List<String> keys = null;

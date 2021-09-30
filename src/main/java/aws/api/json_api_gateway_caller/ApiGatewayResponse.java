@@ -1,4 +1,4 @@
-package aws.json_api_gateway_caller;
+package aws.api.json_api_gateway_caller;
 
 import com.amazonaws.http.HttpResponse;
 import com.amazonaws.util.IOUtils;

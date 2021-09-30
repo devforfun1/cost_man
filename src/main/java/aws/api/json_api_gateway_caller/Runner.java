@@ -1,11 +1,8 @@
-package aws.json_api_gateway_caller;
+package aws.api.json_api_gateway_caller;
 
-import aws.json_api_gateway_caller.JsonApiGatewayCaller;
-import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.http.HttpMethodName;
 import json.JsonParser;
 import json.model.cost_and_usages.CostAndUsagesJson;
-import security.CredentialsClient;
 
 
 import java.io.ByteArrayInputStream;
@@ -66,7 +63,7 @@ public class Runner {
 
             JsonParser jsonParser = new JsonParser();
 
-           return jsonParser.ParseCostAndUsageString(response.getBody());
+           return jsonParser.<CostAndUsagesJson>ParseJsonString(response.getBody(),new CostAndUsagesJson());
 
         } catch (URISyntaxException e) {
             e.printStackTrace();

@@ -15,7 +15,7 @@ public class Main {
 
         AwsRequestHandler awsRequestHandler = new AwsRequestHandler();
 
-        awsRequestHandler.HandleRequest(AwsRequest.MONTHLY_BUDGET);
+        awsRequestHandler.HandleRequest(AwsRequest.EC2_DATA);
 
     }
 
