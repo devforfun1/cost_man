@@ -1,5 +1,7 @@
 package thread;
 
+import json.JsonParser;
+import json.model.ec2.EC2DataJson;
 import thread.base.ShellScriptTask;
 
 public class GetEC2InfoTask extends ShellScriptTask implements Runnable{
@@ -19,6 +21,14 @@ public class GetEC2InfoTask extends ShellScriptTask implements Runnable{
     private void HandleJsonResponse(String jsonResponse){
 
         System.out.println(jsonResponse);
-        //TODO:handle
+
+        JsonParser jsonParser = new JsonParser();
+        EC2DataJson ec2DataJson =  jsonParser.ParseJsonString(jsonResponse,new EC2DataJson());
+
+        ec2DataJson.getReservations()
+                .forEach(r -> r.getInstances()
+                        .forEach(i -> System.out.println("Instances -> "+i.getInstanceId())));
+
+
     }
 }
