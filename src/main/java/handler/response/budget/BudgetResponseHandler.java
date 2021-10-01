@@ -1,7 +1,7 @@
 package handler.response.budget;
 
-import base.ResponseHandlerBase;
-import model.BudgetResponse;
+import handler.response.base.ResponseHandlerBase;
+import model.api.response.BudgetResponseModel;
 import Enum.BudgetStatus;
 
 public class BudgetResponseHandler extends ResponseHandlerBase {
@@ -9,7 +9,7 @@ public class BudgetResponseHandler extends ResponseHandlerBase {
     public BudgetResponseHandler() {
     }
 
-    public void HandleBudgetResponse(BudgetResponse response) {
+    public void HandleBudgetResponse(BudgetResponseModel response) {
 
         System.out.println(response.toString());
 
@@ -33,25 +33,25 @@ public class BudgetResponseHandler extends ResponseHandlerBase {
 
     }
 
-    private void BudgetOK(BudgetResponse response) {
+    private void BudgetOK(BudgetResponseModel response) {
     }
 
 
-    private void BudgetCloseToLimit(BudgetResponse response) {
+    private void BudgetCloseToLimit(BudgetResponseModel response) {
 
-
-
-    }
-
-    private void BudgetUrgent(BudgetResponse response) {
-    }
-
-    private void BudgetOverDue(BudgetResponse response) {
 
 
     }
 
-    private BudgetStatus GetBudgetStatus(BudgetResponse response) {
+    private void BudgetUrgent(BudgetResponseModel response) {
+    }
+
+    private void BudgetOverDue(BudgetResponseModel response) {
+
+
+    }
+
+    private BudgetStatus GetBudgetStatus(BudgetResponseModel response) {
 
         BudgetStatus budgetStatus = BudgetStatus.NOT_DEFINED;
 

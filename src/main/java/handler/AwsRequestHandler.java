@@ -7,6 +7,7 @@ import aws.cli.AwsCLIRequest;
 import com.amazonaws.services.costexplorer.model.Dimension;
 import com.amazonaws.services.costexplorer.model.Metric;
 import singleton.DataStorage;
+import thread.ec2.StartEC2InstanceTask;
 import util.DateUtil;
 
 import java.time.LocalDate;
@@ -93,4 +94,6 @@ public class AwsRequestHandler {
         awsCLIRequest.GetEC2Data();
 
     }
+
+
 }

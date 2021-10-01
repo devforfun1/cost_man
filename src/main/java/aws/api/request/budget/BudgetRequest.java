@@ -2,13 +2,13 @@ package aws.api.request.budget;
 
 import annonation.AwsRequest;
 import handler.response.budget.BudgetResponseHandler;
-import base.RequestBase;
+import aws.api.request.base.RequestBase;
 import com.amazonaws.services.budgets.*;
 import com.amazonaws.services.budgets.AWSBudgetsClientBuilder;
 
 import com.amazonaws.services.budgets.model.Budget;
 import com.amazonaws.services.budgets.model.DescribeBudgetRequest;
-import model.BudgetResponse;
+import model.api.response.BudgetResponseModel;
 import security.CredentialsClient;
 
 import java.time.LocalDateTime;
@@ -41,7 +41,7 @@ public class BudgetRequest extends RequestBase<BudgetResponseHandler> {
             Budget budget = awsBudgets.describeBudget(budgetsRequest).getBudget();
 
 
-            BudgetResponse response = new BudgetResponse(LocalDateTime.now(),
+            BudgetResponseModel response = new BudgetResponseModel(LocalDateTime.now(),
                     budget.getCalculatedSpend().getActualSpend().getAmount(),
                     budget.getBudgetLimit().getAmount(),
                     budget.getBudgetLimit().getUnit());
