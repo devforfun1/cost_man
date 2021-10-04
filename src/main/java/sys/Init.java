@@ -2,7 +2,7 @@ package sys;
 
 import singleton.DataStorage;
 import util.PropUtil;
-import Enum.PropertiesKey;
+import Enum.init.PropertiesKey;
 import java.io.IOException;
 import java.util.Properties;
 

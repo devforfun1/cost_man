@@ -1,6 +1,6 @@
 package handler;
 
-import Enum.AwsRequest;
+import Enum.request.AwsRequest;
 import aws.api.request.budget.BudgetRequest;
 import aws.api.request.cost_explorer.CostExplorerRequest;
 import aws.cli.AwsCLIRequest;

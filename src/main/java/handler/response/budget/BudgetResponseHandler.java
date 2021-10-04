@@ -2,7 +2,7 @@ package handler.response.budget;
 
 import handler.response.base.ResponseHandlerBase;
 import model.api.response.BudgetResponseModel;
-import Enum.BudgetStatus;
+import Enum.budget.BudgetStatus;
 
 public class BudgetResponseHandler extends ResponseHandlerBase {
 
@@ -48,6 +48,9 @@ public class BudgetResponseHandler extends ResponseHandlerBase {
     private void BudgetUrgent(BudgetResponseModel response) {
 
         // 1. Check resource prio list
+
+        //2. IF EC2 in prip
+
         //TODO: Not yet implemente
 
 
