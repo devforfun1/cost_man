@@ -28,7 +28,8 @@ import java.net.URI;
 import java.util.Collections;
 
 public class JsonApiGatewayCaller extends AmazonWebServiceClient {
-    private  final String API_GATEWAY_SERVICE_NAME = "ce";
+    private   String apiGatewayServiceName;
+    private String xAMZTarget;
 
     private AWSCredentialsProvider credentials;
     private final String apiKey;
@@ -37,7 +38,8 @@ public class JsonApiGatewayCaller extends AmazonWebServiceClient {
     private final JsonResponseHandler<ApiGatewayResponse> responseHandler;
     private final JsonErrorResponseHandler errorResponseHandler;
 
-    public JsonApiGatewayCaller(String apiKey, String region, URI endpoint) {
+    public JsonApiGatewayCaller(String apiKey, String region, URI endpoint,String apiGatewayServiceName,
+                                String xAMZTarget) {
 
         super(new ClientConfiguration());
 
@@ -56,9 +58,11 @@ public class JsonApiGatewayCaller extends AmazonWebServiceClient {
 
         this.apiKey = apiKey;
         this.endpoint = endpoint;
+        this.apiGatewayServiceName = apiGatewayServiceName;
+        this.xAMZTarget = xAMZTarget;
 
         this.signer = new AWS4Signer();
-        this.signer.setServiceName(API_GATEWAY_SERVICE_NAME);
+        this.signer.setServiceName(apiGatewayServiceName);
         this.signer.setRegionName(region);
 
         final JsonOperationMetadata metadata = new JsonOperationMetadata().withHasStreamingSuccessResponse(false).withPayloadJson(false);
@@ -89,13 +93,13 @@ public class JsonApiGatewayCaller extends AmazonWebServiceClient {
     }
 
     private DefaultRequest prepareRequest(HttpMethodName method, String resourcePath, InputStream content) {
-        DefaultRequest request = new DefaultRequest(API_GATEWAY_SERVICE_NAME);
+        DefaultRequest request = new DefaultRequest(apiGatewayServiceName);
         request.setHttpMethod(method);
         request.setContent(content);
         request.setEndpoint(this.endpoint);
         request.setResourcePath(resourcePath);
         request.addHeader("Content-type", "application/x-amz-json-1.1");
-        request.addHeader("X-Amz-Target", "AWSInsightsIndexService.GetCostAndUsage");
+        request.addHeader("X-Amz-Target", xAMZTarget);
 
 
         return request;

@@ -34,21 +34,30 @@ public class BudgetResponseHandler extends ResponseHandlerBase {
     }
 
     private void BudgetOK(BudgetResponseModel response) {
+
+        //TODO: Not yet implemented
     }
 
 
     private void BudgetCloseToLimit(BudgetResponseModel response) {
 
-
+        //TODO: Not yet implemented
 
     }
 
     private void BudgetUrgent(BudgetResponseModel response) {
+
+        // 1. Check resource prio list
+        //TODO: Not yet implemente
+
+
+
+
     }
 
     private void BudgetOverDue(BudgetResponseModel response) {
 
-
+        //TODO: Not yet implemented
     }
 
     private BudgetStatus GetBudgetStatus(BudgetResponseModel response) {

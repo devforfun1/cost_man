@@ -12,11 +12,11 @@ import java.net.URISyntaxException;
 public class Runner {
 
     private final String AWS_REGION = "us-east-1";
-    private final String AWS_API_GATEWAY_ENPOINT = "https://ce.us-east-1.amazonaws.com";
+    private final String AWS_API_GATEWAY_ENDPOINT = "https://ce.us-east-1.amazonaws.com";
+    private final String costExplorerServiceName = "ce";
 
 
-
-    private final String TestRequest2 ="{\n" +
+    private final String COST_AND_USAGE_REQUEST_BODY = "{\n" +
             "  \"TimePeriod\": {\n" +
             "    \"Start\": \"2021-09-01\",\n" +
             "    \"End\": \"2021-09-23\"\n" +
@@ -39,12 +39,45 @@ public class Runner {
             "  ]\n" +
             "}";
 
+
+    private final String COST_AND_USAGE_WITH_RESOURCES_REQUEST_BODY = "{\n" +
+            "  \"TimePeriod\": {\n" +
+            "    \"Start\":\"2021-09-28\",\n" +
+            "    \"End\": \"2021-10-04\"\n" +
+            "  },\n" +
+            "  \"Granularity\": \"DAILY\",\n" +
+            " \n" +
+            "  \"GroupBy\":[\n" +
+            "    {\n" +
+            "      \"Type\":\"DIMENSION\",\n" +
+            "      \"Key\":\"RESOURCE_ID\"\n" +
+            "    }\n" +
+            "  ],\n" +
+            "   \"Metrics\":[\"BlendedCost\", \"UnblendedCost\", \"UsageQuantity\"]\n" +
+            "}\n";
+
     public Runner() {
 
-        System.out.println(TestRequest2);
+
     }
 
-    public CostAndUsagesJson MakeRequest() {
+    public CostAndUsagesJson CostAndUsagesWithResourcesRequest() {
+
+        final String xAMZTarget = "AWSInsightsIndexService.GetCostAndUsageWithResources";
+
+        return MakeRequest(xAMZTarget, COST_AND_USAGE_WITH_RESOURCES_REQUEST_BODY);
+    }
+
+    public CostAndUsagesJson CostAndUsagesRequest() {
+
+        final String xAMZTarget = "AWSInsightsIndexService.GetCostAndUsage";
+
+        return MakeRequest(xAMZTarget, COST_AND_USAGE_REQUEST_BODY);
+
+    }
+
+
+    private CostAndUsagesJson MakeRequest(String xAMZTarget, String requestBody) {
 
 
         try {
@@ -53,17 +86,19 @@ public class Runner {
             JsonApiGatewayCaller caller = new JsonApiGatewayCaller(
                     null,
                     AWS_REGION,
-                    new URI(AWS_API_GATEWAY_ENPOINT)
-            );
+                    new URI(AWS_API_GATEWAY_ENDPOINT),
+                    costExplorerServiceName,
+                    xAMZTarget);
 
 
-            ApiGatewayResponse response = caller.execute(HttpMethodName.POST, "", new ByteArrayInputStream(TestRequest2.getBytes()));
+            ApiGatewayResponse response = caller.execute(HttpMethodName.POST, "",
+                    new ByteArrayInputStream(requestBody.getBytes()));
 
             System.out.println(response.getBody());
 
             JsonParser jsonParser = new JsonParser();
 
-           return jsonParser.<CostAndUsagesJson>ParseJsonString(response.getBody(),new CostAndUsagesJson());
+            return jsonParser.<CostAndUsagesJson>ParseJsonString(response.getBody(), new CostAndUsagesJson());
 
         } catch (URISyntaxException e) {
             e.printStackTrace();

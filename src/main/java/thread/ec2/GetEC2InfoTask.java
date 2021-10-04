@@ -31,7 +31,11 @@ public class GetEC2InfoTask extends ShellScriptTask implements Runnable{
 
         ec2DataJson.getReservations()
                 .forEach(r -> r.getInstances()
-                        .forEach(i -> System.out.println("Instances -> "+i.getInstanceId())));
+                        .forEach(i -> System.out.println("Instances -> "+i.getInstanceId() + "\nState -> " + i.getState().getCode())));
+
+
+
+
 
 
     }

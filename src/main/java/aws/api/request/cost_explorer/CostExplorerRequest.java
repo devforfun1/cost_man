@@ -119,11 +119,21 @@ public class CostExplorerRequest extends RequestBase<CostExplorerResponseHandler
         }
     }
 
-    public void CostExplorerJsonData() {
+    public void CostAndUsages() {
 
         Runner runner = new Runner();
 
-        CostAndUsagesJson result = runner.MakeRequest();
+        CostAndUsagesJson result = runner.CostAndUsagesRequest();
+
+        handler.CostAndUsagesJsonResult(result);
+
+    }
+
+    public void CostAndUsagesWithResources() {
+
+        Runner runner = new Runner();
+
+        CostAndUsagesJson result = runner.CostAndUsagesWithResourcesRequest();
 
         handler.CostAndUsagesJsonResult(result);
 

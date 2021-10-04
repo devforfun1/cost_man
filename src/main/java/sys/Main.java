@@ -15,7 +15,7 @@ public class Main {
 
         AwsRequestHandler awsRequestHandler = new AwsRequestHandler();
 
-        awsRequestHandler.HandleRequest(AwsRequest.EC2_DATA);
+        awsRequestHandler.HandleRequest(AwsRequest.COST_AND_USAGES_WITH_RESOURCES);
 
     }
 

@@ -7,7 +7,6 @@ import aws.cli.AwsCLIRequest;
 import com.amazonaws.services.costexplorer.model.Dimension;
 import com.amazonaws.services.costexplorer.model.Metric;
 import singleton.DataStorage;
-import thread.ec2.StartEC2InstanceTask;
 import util.DateUtil;
 
 import java.time.LocalDate;
@@ -42,8 +41,11 @@ public class AwsRequestHandler {
             case COST_FORECAST:
                 CostForeCast();
                 break;
-            case COST_EXPLORER_JSON_DATA:
-                CostExplorerJsonData();
+            case COST_AND_USAGES:
+                CostAndUsages();
+                break;
+            case COST_AND_USAGES_WITH_RESOURCES:
+                CostAndUsagesWithResources();
                 break;
             case EC2_DATA:
                 GetEC2Data();
@@ -82,9 +84,15 @@ public class AwsRequestHandler {
 
     }
 
-    private void CostExplorerJsonData() {
+    private void CostAndUsages() {
 
-        costExplorerRequest.CostExplorerJsonData();
+        costExplorerRequest.CostAndUsages();
+
+    }
+
+    private void CostAndUsagesWithResources() {
+
+        costExplorerRequest.CostAndUsagesWithResources();
 
     }
 
