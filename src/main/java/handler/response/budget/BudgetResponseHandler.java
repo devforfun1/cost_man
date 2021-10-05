@@ -1,7 +1,7 @@
 package handler.response.budget;
 
 import handler.response.base.ResponseHandlerBase;
-import model.api.response.BudgetResponseModel;
+import handler.response.model.BudgetResponseModel;
 import Enum.budget.BudgetStatus;
 
 public class BudgetResponseHandler extends ResponseHandlerBase {

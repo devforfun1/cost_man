@@ -11,6 +11,7 @@ public class Producer {
 
 
 
+
         switch(queueType){
             case RESOURCE_IDS:
                 priorityFactory = (PriorityFactory) ResourcePriority().getFactory();

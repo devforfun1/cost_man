@@ -1,4 +1,4 @@
-package model.api.response.base;
+package handler.response.base;
 
 import util.DateUtil;
 

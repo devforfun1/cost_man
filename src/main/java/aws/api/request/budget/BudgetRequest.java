@@ -1,6 +1,5 @@
 package aws.api.request.budget;
 
-import annonation.AwsRequest;
 import handler.response.budget.BudgetResponseHandler;
 import aws.api.request.base.RequestBase;
 import com.amazonaws.services.budgets.*;
@@ -8,13 +7,12 @@ import com.amazonaws.services.budgets.AWSBudgetsClientBuilder;
 
 import com.amazonaws.services.budgets.model.Budget;
 import com.amazonaws.services.budgets.model.DescribeBudgetRequest;
-import model.api.response.BudgetResponseModel;
+import handler.response.model.BudgetResponseModel;
 import security.CredentialsClient;
 
 import java.time.LocalDateTime;
 
 
-@AwsRequest
 public class BudgetRequest extends RequestBase<BudgetResponseHandler> {
 
 

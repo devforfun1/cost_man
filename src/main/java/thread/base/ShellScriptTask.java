@@ -8,8 +8,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 
-import static sys.ProjectPaths.RESOURCES_PATH;
-import static sys.ProjectPaths.SHELL_SCRIPT_PATH;
+import static datastorage.ProjectPaths.RESOURCES_PATH;
+import static datastorage.ProjectPaths.SHELL_SCRIPT_PATH;
 
 
 public abstract class ShellScriptTask {

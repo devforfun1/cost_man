@@ -1,4 +1,4 @@
-package handler;
+package handler.request;
 
 import Enum.request.AwsRequest;
 import aws.api.request.budget.BudgetRequest;
@@ -6,7 +6,7 @@ import aws.api.request.cost_explorer.CostExplorerRequest;
 import aws.cli.AwsCLIRequest;
 import com.amazonaws.services.costexplorer.model.Dimension;
 import com.amazonaws.services.costexplorer.model.Metric;
-import singleton.DataStorage;
+import datastorage.AwsConfigStorage;
 import util.DateUtil;
 
 import java.time.LocalDate;
@@ -57,7 +57,7 @@ public class AwsRequestHandler {
     private void TotalCost() {
 
 
-        costExplorerRequest.CostAndUsages(Dimension.LINKED_ACCOUNT, DataStorage.getInstance().getAwsAccountNr(), Metric.UNBLENDED_COST,
+        costExplorerRequest.CostAndUsages(Dimension.LINKED_ACCOUNT, AwsConfigStorage.getInstance().getAwsAccountNr(), Metric.UNBLENDED_COST,
                 DateUtil.GetFirstDateOfCurrentMonth(), LocalDate.now());
 
     }
@@ -72,7 +72,7 @@ public class AwsRequestHandler {
     private void MonthlyBudget() {
 
         BudgetRequest budgetRequest = new BudgetRequest();
-        budgetRequest.BudgetWithFilter(DataStorage.getInstance().getAwsAccountNr(), DataStorage.getInstance().getBudgetName());
+        budgetRequest.BudgetWithFilter(AwsConfigStorage.getInstance().getAwsAccountNr(), AwsConfigStorage.getInstance().getBudgetName());
 
     }
 

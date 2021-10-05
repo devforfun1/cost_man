@@ -1,4 +1,4 @@
-package db;
+package datastorage.db;
 
 import com.sun.tools.javac.util.Assert;
 import org.junit.Test;

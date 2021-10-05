@@ -1,6 +1,6 @@
-package model.api.response;
+package handler.response.model;
 
-import model.api.response.base.ResponseModelBase;
+import handler.response.base.ResponseModelBase;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;

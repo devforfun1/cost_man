@@ -5,7 +5,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Properties;
 
-import static sys.ProjectPaths.RESOURCES_PATH;
+import static datastorage.ProjectPaths.RESOURCES_PATH;
 
 public class PropUtil {
 

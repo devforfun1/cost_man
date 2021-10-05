@@ -6,7 +6,7 @@ import com.amazonaws.services.securitytoken.AWSSecurityTokenService;
 import com.amazonaws.services.securitytoken.AWSSecurityTokenServiceClientBuilder;
 import com.amazonaws.services.securitytoken.model.AssumeRoleRequest;
 import com.amazonaws.services.securitytoken.model.Credentials;
-import singleton.DataStorage;
+import datastorage.AwsConfigStorage;
 
 
 public class CredentialsClient {
@@ -18,7 +18,7 @@ public class CredentialsClient {
 
     public AWSStaticCredentialsProvider getCredentials() throws Exception {
         AssumeRoleRequest assumeRole = new AssumeRoleRequest()
-                .withRoleArn(DataStorage.getInstance().getRoleArn())
+                .withRoleArn(AwsConfigStorage.getInstance().getRoleArn())
                 .withRoleSessionName("cost-java-sdk");
 
         AWSSecurityTokenService sts = AWSSecurityTokenServiceClientBuilder.standard().withRegion("us-east-1").build();

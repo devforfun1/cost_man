@@ -1,20 +1,23 @@
-package singleton;
+package datastorage;
 
-public class DataStorage {
+import annonation.Singleton;
 
-    private static DataStorage instance;
+@Singleton
+public class AwsConfigStorage {
+
+    private static AwsConfigStorage instance;
 
     private String awsAccountNr;
     private String roleArn;
     private String budgetName;
 
-    private DataStorage() {}
+    private AwsConfigStorage() {}
 
-    public static synchronized DataStorage getInstance(){
+    public static synchronized AwsConfigStorage getInstance(){
 
         if(instance == null){
 
-            instance = new DataStorage();
+            instance = new AwsConfigStorage();
         }
 
         return instance;

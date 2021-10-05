@@ -1,6 +1,8 @@
-package db;
+package datastorage.db;
 
 import Enum.db.DBPropertiesKeys;
+import Enum.priority.PriorityQueueType;
+import annonation.Singleton;
 import util.PropUtil;
 
 import java.io.IOException;
@@ -10,14 +12,17 @@ import java.sql.SQLException;
 import java.util.Map;
 import java.util.Properties;
 
-import static sys.ProjectPaths.DB_PROPERTIES_FILE_NAME;
+import static datastorage.ProjectPaths.DB_PROPERTIES_FILE_NAME;
 
+@Singleton
 public class DBConnection {
 
 
     private String connectionString;
     private String user;
     private String password;
+
+    private  Connection connection;
 
 
     private static volatile DBConnection instance;
@@ -47,7 +52,7 @@ public class DBConnection {
 
     private void Init(){
 
-        Properties properties = null;
+        Properties properties;
 
         try {
           properties =  PropUtil.ReadPropertiesFile(DB_PROPERTIES_FILE_NAME);
@@ -71,15 +76,20 @@ public class DBConnection {
 
     public Connection Connect() {
 
-        Connection connection = null;
+    if(connection == null){
+
 
         try {
             connection = DriverManager.getConnection(connectionString, user, password);
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
 
         return connection;
     }
+
+
+
 
 }
