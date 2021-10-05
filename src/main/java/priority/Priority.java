@@ -1,5 +1,6 @@
 package priority;
 
+import java.util.List;
 import java.util.PriorityQueue;
 
 public abstract class Priority<T> {
@@ -12,10 +13,13 @@ public abstract class Priority<T> {
         priorityQueue = new PriorityQueue<>();
     }
 
+      PriorityQueue<T> GetPriorityQueue(){
+
+          return priorityQueue;
+      }
+
+
     abstract void InitPriorityQueue();
-
-    abstract T GetPrioritizedElement();
-
 
 
 }

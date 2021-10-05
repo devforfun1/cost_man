@@ -2,7 +2,7 @@ package factory.priority;
 
 import priority.ResourcePriority;
 
-public class ResourcePriorityFactory extends AbstractFactory {
+public class ResourcePriorityFactory extends PriorityFactory {
 
 
 

@@ -1,6 +1,6 @@
 package factory.priority;
 
-public abstract class AbstractFactory {
+public abstract class PriorityFactory {
 
     abstract PriorityType getFactory();
 }

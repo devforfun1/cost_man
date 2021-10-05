@@ -16,18 +16,11 @@ public class ResourceGroupPriority extends Priority<ResourceGroupPrioritys> impl
         priorityQueue.add(ResourceGroupPrioritys.EC2);
     }
 
-    @Override
-    ResourceGroupPrioritys GetPrioritizedElement() {
-        return priorityQueue.poll();
-    }
-
 
     @Override
     public PriorityQueueType GetQueueType() {
         return PriorityQueueType.RESOURCE_GROUPS;
     }
-
-
 
 
 }

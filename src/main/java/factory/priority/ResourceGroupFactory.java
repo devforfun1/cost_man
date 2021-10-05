@@ -3,7 +3,7 @@ package factory.priority;
 import priority.ResourceGroupPriority;
 
 
-public class ResourceGroupFactory extends AbstractFactory {
+public class ResourceGroupFactory extends PriorityFactory {
     @Override
     PriorityType getFactory() {
         //TODO: Implement this

@@ -4,7 +4,7 @@ import Enum.priority.PriorityQueueType;
 
 public class Producer {
 
-    private static AbstractFactory priorityFactory;
+    private static PriorityFactory priorityFactory;
 
 
     public static PriorityType GetFactory(PriorityQueueType queueType){
@@ -13,30 +13,30 @@ public class Producer {
 
         switch(queueType){
             case RESOURCE_IDS:
-                priorityFactory = (AbstractFactory) ResourcePriority().getFactory();
+                priorityFactory = (PriorityFactory) ResourcePriority().getFactory();
                 break;
             case RESOURCE_GROUPS:
-                priorityFactory = (AbstractFactory) ResourceGroupPriority().getFactory();
+                priorityFactory = (PriorityFactory) ResourceGroupPriority().getFactory();
                 break;
             case COMBINED:
-                priorityFactory = (AbstractFactory) CombinedPriority().getFactory();
+                priorityFactory = (PriorityFactory) CombinedPriority().getFactory();
         }
 
         return (PriorityType) priorityFactory;
     }
 
-    private static AbstractFactory ResourcePriority(){
+    private static PriorityFactory ResourcePriority(){
 
 
         return new ResourcePriorityFactory();
     }
 
-    private static AbstractFactory ResourceGroupPriority(){
+    private static PriorityFactory ResourceGroupPriority(){
 
         return new ResourceGroupFactory();
     }
 
-    private static AbstractFactory CombinedPriority(){
+    private static PriorityFactory CombinedPriority(){
 
         return new CombinedFactory();
     }

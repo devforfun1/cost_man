@@ -8,6 +8,8 @@ import util.PropUtil;
 import java.io.IOException;
 import java.util.Properties;
 
+
+
 public class InitTest {
 
     private Properties props;
@@ -23,7 +25,7 @@ public class InitTest {
         roleArn = "";
 
         try {
-            props = PropUtil.ReadPropertiesFile();
+            props = PropUtil.ReadPropertiesFile("config.properties");
             accountId = props.getProperty("ACCOUNT_ID");
             roleArn = props.getProperty("ROLE_ARN");
 
