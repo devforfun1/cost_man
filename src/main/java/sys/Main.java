@@ -9,13 +9,11 @@ import java.sql.SQLException;
 
 public class Main {
 
-    public static void main(String args[]) throws SQLException {
+    public static void main(String args[]) {
 
 
         Init.Start();
 
-        PriorityService priorityService = new PriorityService();
-        System.out.println(priorityService.GetPriorityQueueType().name());
 
         AwsRequestHandler awsRequestHandler = new AwsRequestHandler();
 
