@@ -1,45 +1,53 @@
 package factory.priority;
 
-import Enum.priority.PriorityQueueType;
+
+import datastorage.db.PriorityService;
+import datastorage.db.model.PriorityQueueModel;
+
 
 public class Producer {
 
-    private static PriorityFactory priorityFactory;
+
+    public static PriorityFactory GetFactory() {
+
+        PriorityQueueModel queueModel = new PriorityService().GetSelectedPriorityQueue();
 
 
-    public static PriorityType GetFactory(PriorityQueueType queueType){
-
-
-
-
-        switch(queueType){
+        switch (queueModel.getType()) {
             case RESOURCE_IDS:
-                priorityFactory = (PriorityFactory) ResourcePriority().getFactory();
-                break;
+                return resourcePriorityFactory();
             case RESOURCE_GROUPS:
-                priorityFactory = (PriorityFactory) ResourceGroupPriority().getFactory();
-                break;
+                return resourceGroupFactory();
             case COMBINED:
-                priorityFactory = (PriorityFactory) CombinedPriority().getFactory();
+                return combinedFactory();
         }
 
-        return (PriorityType) priorityFactory;
+        return null;
     }
 
-    private static PriorityFactory ResourcePriority(){
+    private static ResourcePriorityFactory resourcePriorityFactory() {
+        ResourcePriorityFactory resourcePriorityFactory = new ResourcePriorityFactory();
+        resourcePriorityFactory.InitFactory();
 
-
-        return new ResourcePriorityFactory();
+        return resourcePriorityFactory;
     }
 
-    private static PriorityFactory ResourceGroupPriority(){
 
-        return new ResourceGroupFactory();
+    private static ResourceGroupFactory resourceGroupFactory() {
+        ResourceGroupFactory resourceGroupFactory = new ResourceGroupFactory();
+        resourceGroupFactory.InitFactory();
+
+        return resourceGroupFactory;
     }
 
-    private static PriorityFactory CombinedPriority(){
+    private static CombinedFactory combinedFactory() {
 
-        return new CombinedFactory();
+
+        CombinedFactory combinedFactory = new CombinedFactory();
+
+        combinedFactory.InitFactory();
+
+        return combinedFactory;
     }
 
 

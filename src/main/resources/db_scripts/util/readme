@@ -1,0 +1,1 @@
+In order to run this script you need to define a enviroment variable for your psql user called PSQL_USER
