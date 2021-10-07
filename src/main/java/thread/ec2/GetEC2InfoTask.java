@@ -26,6 +26,8 @@ public class GetEC2InfoTask extends ShellScriptTask implements Runnable {
         String jsonResponse = RunShellScript();
 
         HandleJsonResponse(jsonResponse);
+
+
     }
 
     private void HandleJsonResponse(String jsonResponse) {
@@ -44,16 +46,19 @@ public class GetEC2InfoTask extends ShellScriptTask implements Runnable {
 
             for (Instance e : r.getInstances()) {
 
-                if (e.getState().getCode() == 16)
-                    ResourceStorage.getInstance().AddEc2StoppedInstance(e.getInstanceId());
-
-                else if (e.getState().getCode() == 80)
+                if (e.getState().getCode() == 16){
                     ResourceStorage.getInstance().AddEc2RunningInstance(e.getInstanceId());
+                System.out.println("Added instance to RUNNING list with state -> " +e.getState().getName());}
 
+                else if (e.getState().getCode() == 80) {
+                    ResourceStorage.getInstance().AddEc2StoppedInstance(e.getInstanceId());
+                    System.out.println("Added instance to STOP list with state -> " +e.getState().getName());
+                }
             }
         }
-
         ResourceStorage.getInstance().Ec2OperationRunning(false);
+
+
 
     }
 }

@@ -34,10 +34,8 @@ public class AwsCLIRequest {
 
         ExecutorService executor = Executors.newSingleThreadExecutor();
 
-
         executor.execute(new StopEC2InstanceTask(EC2_STOP_INSTANCE_SCRIPT_NAME,
                 instanceId));
-
 
         executor.shutdown();
 
@@ -45,16 +43,19 @@ public class AwsCLIRequest {
 
     public void StopEC2Instances(List<String> instanceIds) {
 
-        int threadPoolSize = instanceIds.size();
+        final int threadPoolSize = instanceIds.size();
 
-        ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(threadPoolSize);
-
-
-        instanceIds.forEach(id -> executor.execute(new StopEC2InstanceTask(EC2_STOP_INSTANCE_SCRIPT_NAME, id)));
+        if (threadPoolSize > 0) {
 
 
-        executor.shutdown();
+            ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(threadPoolSize);
 
+
+            instanceIds.forEach(id -> executor.execute(new StopEC2InstanceTask(EC2_STOP_INSTANCE_SCRIPT_NAME, id)));
+
+
+            executor.shutdown();
+        }
     }
 
     public void StartEC2Instance(String instanceId) {
@@ -65,11 +66,21 @@ public class AwsCLIRequest {
         executor.execute(new StartEC2InstanceTask(EC2_Start_INSTANCE_SCRIPT_NAME,
                 instanceId));
 
-
         executor.shutdown();
-
 
     }
 
+    public void StartEC2Instances(List<String> instanceIds) {
 
+        final int threadPoolSize = instanceIds.size();
+
+        if (threadPoolSize > 0) {
+
+            ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(threadPoolSize);
+
+            instanceIds.forEach(id -> executor.execute(new StartEC2InstanceTask(EC2_Start_INSTANCE_SCRIPT_NAME, id)));
+
+            executor.shutdown();
+        }
+    }
 }

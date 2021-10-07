@@ -14,11 +14,18 @@ import priority.ResourceGroupPriority;
 
 
 import java.util.List;
+import java.util.Queue;
 
 public class BudgetResponseHandler extends ResponseHandlerBase {
 
+    private PriorityService priorityService;
+    private AwsCLIRequest awsCLIRequest;
+
 
     public BudgetResponseHandler() {
+
+        priorityService = new PriorityService();
+        awsCLIRequest = new AwsCLIRequest();
     }
 
     public void HandleBudgetResponse(BudgetResponseModel response) {
@@ -47,7 +54,19 @@ public class BudgetResponseHandler extends ResponseHandlerBase {
 
     private void BudgetOK(BudgetResponseModel response) {
 
-        //TODO: Not yet implemented
+        PriorityQueueType queueType = GetSelectedPriority();
+
+        if (queueType == PriorityQueueType.RESOURCE_GROUPS) {
+
+            ResourceGroupPriorities queueElement = GetResourceGroupPriority().getPriorityQueue().poll();
+
+            if (queueElement == ResourceGroupPriorities.EC2) {
+
+                Ec2ResourceGroupOperation(BudgetStatus.OK);
+
+            }
+
+        }
     }
 
 
@@ -59,32 +78,23 @@ public class BudgetResponseHandler extends ResponseHandlerBase {
 
     private void BudgetUrgent(BudgetResponseModel response) {
 
-        PriorityService service = new PriorityService();
-
-        PriorityQueueType queueType = service.GetSelectedPriorityQueue().getType();
+        PriorityQueueType queueType = GetSelectedPriority();
 
         if (queueType == PriorityQueueType.RESOURCE_GROUPS) {
 
-            ResourceGroupPriorities queueElement = ResourceGroupPriority();
 
+            ResourceGroupPriorities queueElement = GetResourceGroupPriority().getPriorityQueue().poll();
             if (queueElement == ResourceGroupPriorities.EC2) {
 
-                AwsCLIRequest awsCLIRequest = new AwsCLIRequest();
 
-                ResourceStorage.getInstance().Ec2OperationRunning(true);
+                Ec2ResourceGroupOperation(BudgetStatus.URGENT);
 
-                awsCLIRequest.GetEC2Data();
+            } else if (queueElement == ResourceGroupPriorities.VPC) {
 
+                //TODO: Not yet implemented
+            } else if (queueElement == ResourceGroupPriorities.EKS) {
 
-                while (ResourceStorage.getInstance().IsEc2OperationRunning()) {
-
-                    // Wait
-                }
-
-                List<String> runningEc2s = ResourceStorage.getInstance().getEc2RunningInstances();
-
-                awsCLIRequest.StopEC2Instances(runningEc2s);
-
+                //TODO: Not yet implemented
             }
         }
 
@@ -94,6 +104,12 @@ public class BudgetResponseHandler extends ResponseHandlerBase {
 
         //TODO: Not yet implemented
     }
+
+    /**
+     * Threshold values for different budget statuses
+     * @param response
+     * @return
+     */
 
     private BudgetStatus GetBudgetStatus(BudgetResponseModel response) {
 
@@ -118,19 +134,64 @@ public class BudgetResponseHandler extends ResponseHandlerBase {
             }
 
         }
-
         return budgetStatus;
     }
 
-    private ResourceGroupPriorities ResourceGroupPriority() {
+    /**
+     * Gets the selected priority policy from the repository
+     * @return
+     */
+    private PriorityQueueType GetSelectedPriority() {
+
+        return priorityService.GetSelectedPriorityQueue().getType();
+    }
+
+    /**
+     * Gets the wrapper for the ResourceGroup Priority Queue
+     * @return
+     */
+    private ResourceGroupPriority GetResourceGroupPriority() {
 
         ResourceGroupFactory factory = (ResourceGroupFactory) Producer.GetFactory();
 
         ResourceGroupPriority rg = factory.Create();
 
-        return rg.getPriorityQueue().poll();
+        return rg;
+    }
 
+    /**
+     * Start or stops EC2 instances based on the budget status and their previous state
+     * This method should only be used when resource group priority is used
+     *
+     * @param status
+     */
+    private void Ec2ResourceGroupOperation(BudgetStatus status) {
 
+        ResourceStorage.getInstance().Ec2OperationRunning(true);
+
+        // Sets EC2 information data in ResourceStorage (Singleton)
+        awsCLIRequest.GetEC2Data();
+
+        while (ResourceStorage.getInstance().IsEc2OperationRunning()) {
+
+            // wait for  awsCLIRequest.GetEC2Data() to finish
+        }
+
+        List<String> ec2InstanceIds;
+
+        // Starts all stopped Ec2 instances
+        if (status == BudgetStatus.OK) {
+            ec2InstanceIds = ResourceStorage.getInstance().getEc2StoppedInstances();
+            awsCLIRequest.StartEC2Instances(ec2InstanceIds);
+        }
+
+        //Stops all running Ec2 instances
+        else if(status == BudgetStatus.URGENT) {
+            ec2InstanceIds = ResourceStorage.getInstance().getEc2RunningInstances();
+            awsCLIRequest.StopEC2Instances(ec2InstanceIds);
+        }
+
+        ResourceStorage.getInstance().ClearLists();
     }
 
 }

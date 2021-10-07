@@ -23,7 +23,11 @@ public class ResourceGroupFactory extends PriorityFactory implements Factory<Res
     }
 
 
-
+    /**
+     * Creates a FIFO Queue with priority parameters from the repository
+     *
+     * @return
+     */
     @Override
     public ResourceGroupPriority Create() {
 
@@ -74,9 +78,4 @@ public class ResourceGroupFactory extends PriorityFactory implements Factory<Res
             return null;
     }
 
-    @Override
-    public void InitPriorityQueue() {
-
-
-    }
 }

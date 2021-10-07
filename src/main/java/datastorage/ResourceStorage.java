@@ -13,7 +13,7 @@ public class ResourceStorage {
     private static volatile ResourceStorage instance;
     private static Object mutex = new Object();
 
-    private volatile Boolean ec2OperationRunning;
+    private  volatile Boolean ec2OperationRunning;
 
 
     private List<String> ec2RunningInstances;
@@ -54,8 +54,8 @@ public class ResourceStorage {
         ec2RunningInstances.add(ec2RunningInstance);
     }
 
-    public void AddEc2StoppedInstance(String ec2RunningInstance) {
-        ec2RunningInstances.add(ec2RunningInstance);
+    public void AddEc2StoppedInstance(String ec2StoppedInstance) {
+        ec2StoppedInstances.add(ec2StoppedInstance);
     }
 
     public List<String> getEc2StoppedInstances() {
@@ -73,13 +73,12 @@ public class ResourceStorage {
     }
 
 
-    public  Boolean IsEc2OperationRunning() {
+    public Boolean IsEc2OperationRunning() {
         return ec2OperationRunning;
     }
 
     public  void Ec2OperationRunning(Boolean ec2OperationRunning) {
         this.ec2OperationRunning = ec2OperationRunning;
     }
-
 
 }
