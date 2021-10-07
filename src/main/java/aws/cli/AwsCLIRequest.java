@@ -5,8 +5,10 @@ import thread.ec2.StartEC2InstanceTask;
 import thread.ec2.StopEC2InstanceTask;
 
 
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
 
 
 public class AwsCLIRequest {
@@ -35,6 +37,20 @@ public class AwsCLIRequest {
 
         executor.execute(new StopEC2InstanceTask(EC2_STOP_INSTANCE_SCRIPT_NAME,
                 instanceId));
+
+
+        executor.shutdown();
+
+    }
+
+    public void StopEC2Instances(List<String> instanceIds) {
+
+        int threadPoolSize = instanceIds.size();
+
+        ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(threadPoolSize);
+
+
+        instanceIds.forEach(id -> executor.execute(new StopEC2InstanceTask(EC2_STOP_INSTANCE_SCRIPT_NAME, id)));
 
 
         executor.shutdown();

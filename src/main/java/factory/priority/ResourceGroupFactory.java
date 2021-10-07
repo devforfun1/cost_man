@@ -3,10 +3,13 @@ package factory.priority;
 
 import Enum.priority.ResourceGroupPriorities;
 import datastorage.db.model.PriorityQueuePlaceModel;
+
 import priority.ResourceGroupPriority;
 
-import java.util.List;
-import java.util.PriorityQueue;
+
+import java.util.LinkedList;
+
+import java.util.Queue;
 
 
 public class ResourceGroupFactory extends PriorityFactory implements Factory<ResourceGroupPriority> {
@@ -20,13 +23,14 @@ public class ResourceGroupFactory extends PriorityFactory implements Factory<Res
     }
 
 
+
     @Override
     public ResourceGroupPriority Create() {
 
         ResourceGroupPriority resourceGroupPriority = new ResourceGroupPriority();
 
 
-        PriorityQueue<ResourceGroupPriorities> priorityQueue = new PriorityQueue<ResourceGroupPriorities>();
+        Queue<ResourceGroupPriorities> priorityQueue = new LinkedList<>();
 
         PriorityQueuePlaceModel firstPrio = queueModel.getPriorityQueuePlaces().stream().filter(e -> e.getParentId() == 0).findFirst().get();
 

@@ -1,6 +1,6 @@
 package factory.priority;
 
-import priority.CombinedPriority;
+
 
 public class CombinedFactory extends PriorityFactory {
 
@@ -8,4 +8,5 @@ public class CombinedFactory extends PriorityFactory {
     void InitFactory() {
 
     }
+
 }

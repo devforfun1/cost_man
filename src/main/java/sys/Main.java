@@ -10,6 +10,7 @@ import priority.ResourceGroupPriority;
 
 import java.sql.SQLException;
 import java.util.PriorityQueue;
+import java.util.Queue;
 
 
 public class Main {
@@ -18,21 +19,10 @@ public class Main {
 
         Init.Start();
 
-        ResourceGroupFactory factory = (ResourceGroupFactory) Producer.GetFactory();
-
-        ResourceGroupPriority rg = factory.Create();
-
-        PriorityQueue pq = rg.getPriorityQueue();
-
-
-        System.out.println(pq.poll());
-        System.out.println(pq.poll());
-        System.out.println(pq.poll());
-
 
         AwsRequestHandler awsRequestHandler = new AwsRequestHandler();
 
-        awsRequestHandler.HandleRequest(AwsRequest.EC2_DATA);
+        awsRequestHandler.HandleRequest(AwsRequest.MONTHLY_BUDGET);
 
     }
 

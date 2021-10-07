@@ -1,18 +1,19 @@
 package priority;
 
 import java.util.PriorityQueue;
+import java.util.Queue;
 
 public class PriorityBase<T> {
 
 
 
-    private PriorityQueue<T> priorityQueue;
+    private Queue<T> priorityQueue;
 
-    public PriorityQueue<T> getPriorityQueue() {
+    public Queue<T> getPriorityQueue() {
         return priorityQueue;
     }
 
-    public void setPriorityQueue(PriorityQueue<T> priorityQueue) {
+    public void setPriorityQueue(Queue<T> priorityQueue) {
         this.priorityQueue = priorityQueue;
     }
 }

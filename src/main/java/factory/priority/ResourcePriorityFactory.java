@@ -9,4 +9,6 @@ public class ResourcePriorityFactory extends PriorityFactory {
     void InitFactory() {
 
     }
+
+
 }

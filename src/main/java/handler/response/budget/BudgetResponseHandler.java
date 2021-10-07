@@ -1,10 +1,22 @@
 package handler.response.budget;
 
+import Enum.priority.PriorityQueueType;
+import Enum.priority.ResourceGroupPriorities;
+import aws.cli.AwsCLIRequest;
+import datastorage.ResourceStorage;
+import datastorage.db.PriorityService;
+import factory.priority.Producer;
+import factory.priority.ResourceGroupFactory;
 import handler.response.base.ResponseHandlerBase;
 import handler.response.model.BudgetResponseModel;
 import Enum.budget.BudgetStatus;
+import priority.ResourceGroupPriority;
+
+
+import java.util.List;
 
 public class BudgetResponseHandler extends ResponseHandlerBase {
+
 
     public BudgetResponseHandler() {
     }
@@ -47,14 +59,34 @@ public class BudgetResponseHandler extends ResponseHandlerBase {
 
     private void BudgetUrgent(BudgetResponseModel response) {
 
-        // 1. Check resource prio list
+        PriorityService service = new PriorityService();
 
-        //2. IF EC2 in prip
+        PriorityQueueType queueType = service.GetSelectedPriorityQueue().getType();
 
-        //TODO: Not yet implemente
+        if (queueType == PriorityQueueType.RESOURCE_GROUPS) {
+
+            ResourceGroupPriorities queueElement = ResourceGroupPriority();
+
+            if (queueElement == ResourceGroupPriorities.EC2) {
+
+                AwsCLIRequest awsCLIRequest = new AwsCLIRequest();
+
+                ResourceStorage.getInstance().Ec2OperationRunning(true);
+
+                awsCLIRequest.GetEC2Data();
 
 
+                while (ResourceStorage.getInstance().IsEc2OperationRunning()) {
 
+                    // Wait
+                }
+
+                List<String> runningEc2s = ResourceStorage.getInstance().getEc2RunningInstances();
+
+                awsCLIRequest.StopEC2Instances(runningEc2s);
+
+            }
+        }
 
     }
 
@@ -89,4 +121,16 @@ public class BudgetResponseHandler extends ResponseHandlerBase {
 
         return budgetStatus;
     }
+
+    private ResourceGroupPriorities ResourceGroupPriority() {
+
+        ResourceGroupFactory factory = (ResourceGroupFactory) Producer.GetFactory();
+
+        ResourceGroupPriority rg = factory.Create();
+
+        return rg.getPriorityQueue().poll();
+
+
+    }
+
 }

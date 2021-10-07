@@ -13,4 +13,6 @@ public abstract class PriorityFactory {
 
     abstract void InitFactory();
 
+
+
 }
