@@ -9,6 +9,7 @@ import com.amazonaws.services.budgets.model.Budget;
 import com.amazonaws.services.budgets.model.DescribeBudgetRequest;
 import handler.response.model.BudgetResponseModel;
 import security.CredentialsClient;
+import util.DateUtil;
 
 import java.time.LocalDateTime;
 
@@ -42,8 +43,9 @@ public class BudgetRequest extends RequestBase<BudgetResponseHandler> {
             BudgetResponseModel response = new BudgetResponseModel(LocalDateTime.now(),
                     budget.getCalculatedSpend().getActualSpend().getAmount(),
                     budget.getBudgetLimit().getAmount(),
-                    budget.getBudgetLimit().getUnit());
-
+                    budget.getBudgetLimit().getUnit(),
+                    DateUtil.ConvertDate(budget.getTimePeriod().getStart()),
+                    DateUtil.ConvertDate(budget.getTimePeriod().getEnd()));
 
             awsBudgets.shutdown();
 

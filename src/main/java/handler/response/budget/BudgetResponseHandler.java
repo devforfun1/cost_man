@@ -13,6 +13,7 @@ import handler.response.model.BudgetResponseModel;
 import Enum.budget.BudgetStatus;
 import handler.response.model.Ec2CeDataModel;
 import priority.ResourceGroupPriority;
+import software.amazon.awssdk.services.budgets.model.BudgetsResponse;
 
 
 import java.util.Dictionary;
@@ -65,7 +66,7 @@ public class BudgetResponseHandler extends ResponseHandlerBase {
 
             if (queueElement == ResourceGroupPriorities.EC2) {
 
-                Ec2ResourceGroupOperation(BudgetStatus.OK);
+                Ec2ResourceGroupOperation(BudgetStatus.OK,response);
 
             }
 
@@ -83,7 +84,7 @@ public class BudgetResponseHandler extends ResponseHandlerBase {
 
             if (queueElement == ResourceGroupPriorities.EC2) {
 
-                Ec2ResourceGroupOperation(BudgetStatus.CLOSE_TO_LIMIT);
+                Ec2ResourceGroupOperation(BudgetStatus.CLOSE_TO_LIMIT,response);
 
             }}
     }
@@ -99,7 +100,7 @@ public class BudgetResponseHandler extends ResponseHandlerBase {
             if (queueElement == ResourceGroupPriorities.EC2) {
 
 
-                Ec2ResourceGroupOperation(BudgetStatus.URGENT);
+                Ec2ResourceGroupOperation(BudgetStatus.URGENT,response);
 
             } else if (queueElement == ResourceGroupPriorities.VPC) {
 
@@ -134,10 +135,16 @@ public class BudgetResponseHandler extends ResponseHandlerBase {
         if (response.IsBudgetOverDue()) {
             budgetStatus = BudgetStatus.OVER_DUE;
         } else {
-            if (percentage >= 0 && percentage <= 0.70) {
 
+            if (percentage >= 0 && percentage <= 0.45) {
                 budgetStatus = BudgetStatus.OK;
-            } else if (percentage > 0.70 && percentage <= 0.89) {
+            }
+
+            else if(percentage > 0.45 && percentage <=0.70){
+                budgetStatus = BudgetStatus.LEVEL2;
+            }
+
+            else if (percentage > 0.70 && percentage <= 0.89) {
 
                 budgetStatus = BudgetStatus.CLOSE_TO_LIMIT;
             } else if (percentage >= 0.90 && percentage <= 1) {
@@ -177,7 +184,7 @@ public class BudgetResponseHandler extends ResponseHandlerBase {
      *
      * @param status
      */
-    private void Ec2ResourceGroupOperation(BudgetStatus status) {
+    private void Ec2ResourceGroupOperation(BudgetStatus status,BudgetResponseModel response) {
 
         ResourceStorage.getInstance().Ec2OperationRunning(true);
 
@@ -186,7 +193,7 @@ public class BudgetResponseHandler extends ResponseHandlerBase {
 
         while (ResourceStorage.getInstance().IsEc2OperationRunning()) {
 
-            // wait for  awsCLIRequest.GetEC2Data() to finish
+            // wait for thread in awsCLIRequest.GetEC2Data() to finish
         }
 
         List<String> ec2InstanceIds;
