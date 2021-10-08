@@ -6,19 +6,23 @@ import aws.api.request.base.RequestBase;
 import com.amazonaws.services.costexplorer.AWSCostExplorer;
 import com.amazonaws.services.costexplorer.AWSCostExplorerClientBuilder;
 import com.amazonaws.services.costexplorer.model.*;
+import handler.response.model.Ec2CeDataModel;
 import json.model.cost_and_usages.CostAndUsagesJson;
 import security.CredentialsClient;
 
 import util.DateUtil;
 
 import java.time.LocalDate;
+import java.util.Dictionary;
+import java.util.List;
 
 
 public class CostExplorerRequest extends RequestBase<CostExplorerResponseHandler> {
 
-
+    private Runner runner;
     public CostExplorerRequest() {
 
+        runner = new Runner();
         handler = new CostExplorerResponseHandler();
 
     }
@@ -119,22 +123,33 @@ public class CostExplorerRequest extends RequestBase<CostExplorerResponseHandler
 
     public void CostAndUsages() {
 
-        Runner runner = new Runner();
-
         CostAndUsagesJson result = runner.CostAndUsagesRequest();
-
         handler.CostAndUsagesJsonResult(result);
 
     }
 
     public void CostAndUsagesWithResources() {
 
-        Runner runner = new Runner();
+        LocalDate startDate = LocalDate.now().minusDays(14);
+        LocalDate endDate = LocalDate.now();
 
-        CostAndUsagesJson result = runner.CostAndUsagesWithResourcesRequest();
 
-        handler.CostAndUsagesJsonResult(result);
+       CostAndUsagesJson result = runner.CostAndUsagesWithResourcesRequest(startDate,endDate);
+
+
+        handler.CostAndUsagesWithResourcesJsonResult(result);
+
 
     }
 
+    public Dictionary<String, Ec2CeDataModel> GetEc2UsagesValueDict(List<String> ec2InstanceIds) {
+
+        LocalDate startDate = LocalDate.now().minusDays(14);
+        LocalDate endDate = LocalDate.now();
+
+        CostAndUsagesJson result = runner.CostAndUsagesWithResourcesRequest(startDate,endDate);
+
+        return handler.Ec2UsagesValueDict(result,ec2InstanceIds);
+
+    }
 }

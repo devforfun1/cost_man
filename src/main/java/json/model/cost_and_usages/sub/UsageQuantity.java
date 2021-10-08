@@ -57,4 +57,8 @@ public class UsageQuantity implements Serializable {
         this.additionalProperties.put(name, value);
     }
 
+    public Double GetAmountDoubleValue(){
+
+        return Double.parseDouble(amount);
+    }
 }

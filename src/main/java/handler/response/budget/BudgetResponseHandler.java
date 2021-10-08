@@ -2,6 +2,7 @@ package handler.response.budget;
 
 import Enum.priority.PriorityQueueType;
 import Enum.priority.ResourceGroupPriorities;
+import aws.api.request.cost_explorer.CostExplorerRequest;
 import aws.cli.AwsCLIRequest;
 import datastorage.ResourceStorage;
 import datastorage.db.PriorityService;
@@ -10,11 +11,13 @@ import factory.priority.ResourceGroupFactory;
 import handler.response.base.ResponseHandlerBase;
 import handler.response.model.BudgetResponseModel;
 import Enum.budget.BudgetStatus;
+import handler.response.model.Ec2CeDataModel;
 import priority.ResourceGroupPriority;
 
 
+import java.util.Dictionary;
 import java.util.List;
-import java.util.Queue;
+
 
 public class BudgetResponseHandler extends ResponseHandlerBase {
 
@@ -72,8 +75,17 @@ public class BudgetResponseHandler extends ResponseHandlerBase {
 
     private void BudgetCloseToLimit(BudgetResponseModel response) {
 
-        //TODO: Not yet implemented
+        PriorityQueueType queueType = GetSelectedPriority();
 
+        if (queueType == PriorityQueueType.RESOURCE_GROUPS) {
+
+            ResourceGroupPriorities queueElement = GetResourceGroupPriority().getPriorityQueue().poll();
+
+            if (queueElement == ResourceGroupPriorities.EC2) {
+
+                Ec2ResourceGroupOperation(BudgetStatus.CLOSE_TO_LIMIT);
+
+            }}
     }
 
     private void BudgetUrgent(BudgetResponseModel response) {
@@ -183,6 +195,20 @@ public class BudgetResponseHandler extends ResponseHandlerBase {
         if (status == BudgetStatus.OK) {
             ec2InstanceIds = ResourceStorage.getInstance().getEc2StoppedInstances();
             awsCLIRequest.StartEC2Instances(ec2InstanceIds);
+        }
+
+        else if(status == BudgetStatus.CLOSE_TO_LIMIT){
+
+
+            CostExplorerRequest ceRequest = new CostExplorerRequest();
+            ec2InstanceIds = ResourceStorage.getInstance().getEc2RunningInstances();
+
+            Dictionary<String, Ec2CeDataModel> ec2SumValesDict = ceRequest.GetEc2UsagesValueDict(ec2InstanceIds);
+            ec2InstanceIds.
+                    forEach( id -> System.out.println("id -> "+id +"\ncost -> "+ec2SumValesDict.get(id).getSummedPriced() +
+                    "\nSummed Usage -> " +ec2SumValesDict.get(id).getSummedUsageQuantity()));
+
+            //TODO: Finish implementation
         }
 
         //Stops all running Ec2 instances

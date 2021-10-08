@@ -3,11 +3,13 @@ package aws.api.json_api_gateway_caller;
 import com.amazonaws.http.HttpMethodName;
 import json.JsonParser;
 import json.model.cost_and_usages.CostAndUsagesJson;
+import util.DateUtil;
 
 
 import java.io.ByteArrayInputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.time.LocalDate;
 
 public class Runner {
 
@@ -61,11 +63,12 @@ public class Runner {
 
     }
 
-    public CostAndUsagesJson CostAndUsagesWithResourcesRequest() {
+    public CostAndUsagesJson CostAndUsagesWithResourcesRequest(LocalDate startDate,LocalDate endDate) {
 
         final String xAMZTarget = "AWSInsightsIndexService.GetCostAndUsageWithResources";
 
-        return MakeRequest(xAMZTarget, COST_AND_USAGE_WITH_RESOURCES_REQUEST_BODY);
+        return MakeRequest(xAMZTarget, GetRequestBodyCostAndUsagesWithResources(startDate,
+                endDate));
     }
 
     public CostAndUsagesJson CostAndUsagesRequest() {
@@ -106,6 +109,27 @@ public class Runner {
 
         return new CostAndUsagesJson();
     }
+private String GetRequestBodyCostAndUsagesWithResources(LocalDate startDate,LocalDate endDate){
 
+        return "{\n" +
+                "  \"TimePeriod\": {\n" +
+                "    \"Start\":\""+ DateUtil.ConvertDate(startDate)+"\",\n" +
+                "    \"End\": \""+DateUtil.ConvertDate(endDate)+"\"\n" +
+                "  },\n" +
+                "  \"Granularity\": \"DAILY\",\n" +
+                " \n" +
+                "  \"GroupBy\":[\n" +
+                "    {\n" +
+                "      \"Type\":\"DIMENSION\",\n" +
+                "      \"Key\":\"RESOURCE_ID\"\n" +
+                "    },\n" +
+                "    { \"Type\":\"DIMENSION\",\n" +
+                "      \"Key\":\"SERVICE\"}\n" +
+                "\n" +
+                "\n" +
+                "  ],\n" +
+                "   \"Metrics\":[\"BlendedCost\", \"UnblendedCost\", \"UsageQuantity\"]\n" +
+                "}";
+}
 
 }

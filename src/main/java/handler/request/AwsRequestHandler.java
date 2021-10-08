@@ -94,6 +94,7 @@ public class AwsRequestHandler {
 
         costExplorerRequest.CostAndUsagesWithResources();
 
+
     }
 
 
