@@ -5,13 +5,11 @@ import aws.cli.AwsCLIRequest;
 import exception.BudgetNotSupportedException;
 import handler.response.model.BudgetResponseModel;
 import handler.response.model.Ec2CeDataModel;
+import software.amazon.awssdk.services.dynamodb.model.Get;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.Dictionary;
-import java.util.Enumeration;
-import java.util.List;
+import java.util.*;
 
 // Refactor class later ...
 public class Ec2Resource {
@@ -34,9 +32,17 @@ public class Ec2Resource {
 
             Enumeration<String> e = ec2SumValesDict.keys();
 
+            System.out.println("budgetResponseModel -> " + responseModel.toString() );
+
             String id;
             double ec2InstancePortionOfBudgetPercentage = 0;
-            double predictedPrice = 0;
+
+
+            double predictedEc2Cost = 0;
+
+
+            Dictionary<String,Double> predictedCostDict = new Hashtable<>();
+
 
             if (status == BudgetStatus.CLOSE_TO_LIMIT) {
 
@@ -44,42 +50,89 @@ public class Ec2Resource {
 
                     id = e.nextElement();
 
-
+                    System.out.println();
                     System.out.println("id -> " + id + "\ncost -> " + ec2SumValesDict.get(id).getSummedPriced() +
                             "\nSummed Usage -> " + ec2SumValesDict.get(id).getSummedUsageQuantity());
 
 
-                    predictedPrice = predictedPrice + GetPredictedCostForBudgetEndDate(ec2SumValesDict.get(id).getSummedPriced(),
-                            responseModel.getEndDate());
+                    System.out.println("ec2 instance percentage -> " + GetPercentageOfBudget(responseModel,
+                            ec2SumValesDict.get(id).getSummedPriced()));
+
+                    ec2InstancePortionOfBudgetPercentage = ec2InstancePortionOfBudgetPercentage + GetPercentageOfBudget(responseModel,
+                            ec2SumValesDict.get(id).getSummedPriced());
+
+                    predictedCostDict.put(id,GetPredictedCostForBudgetEndDate(ec2SumValesDict.get(id).getSummedPriced(),
+                            responseModel.getEndDate()));
+
+
+                    predictedEc2Cost = predictedEc2Cost + predictedCostDict.get(id);
+
+
 
                 }
+                System.out.println("percentage remaining of budget -> "+responseModel.GetRemainingPercentage());
 
                 Enumeration<String> e2 = ec2SumValesDict.keys();
 
-                double predictedEc2CostPercentage = GetPercentageOfBudget(responseModel, predictedPrice);
-                double mockPredictedEc2CostPercentage = 0.07;
 
-                System.out.println("percentage left of budget -> "+responseModel.GetRemainingPercentage());
+                    double predictedEc2CostPlusAmountUsed = predictedEc2Cost + responseModel.getAmountUsed().doubleValue();
 
-                if (mockPredictedEc2CostPercentage >= responseModel.GetRemainingPercentage()) {
+                System.out.println("predictedEc2CostPlusAmountUsed -> " +predictedEc2CostPlusAmountUsed);
+                if (predictedEc2CostPlusAmountUsed >= responseModel.getLimit().doubleValue()) {
+
+                    System.out.println("in predicted block");
+
+               double predictedCostOverDue  =  predictedEc2CostPlusAmountUsed - responseModel.getLimit().doubleValue();
+
+
+                    System.out.println("Predicted cost overdue -> " + predictedCostOverDue);
+
+                    /**
+                     * List that contains elements in e2 enumeration that will solve the budget issue on its own
+                     */
+                  List<String> singleElementSolution = new ArrayList<>();
+                    /**
+                     *  Elements in e2 enumeration that dosnt solve the budget issue on its own
+                     */
+                  List<String> elementCombinedSolution = new ArrayList<>();
 
                     while (e2.hasMoreElements()) {
-                        instanceIdsToShutdown.add(e2.nextElement());
-                    }
 
-                    awsCLIRequest.StopEC2Instances(instanceIdsToShutdown);
-
-                } else {
-
-                    System.out.println("i");
-
-                    while (e2.hasMoreElements()) {
+                        String idE2 = e2.nextElement();
 
 
 
-                        //System.out.println("ec2 instance percentage -> " + GetPercentageOfBudget(responseModel,ec2SumValesDict.get(e2.nextElement()).getSummedPriced()));
+                        if(predictedCostDict.get(idE2) - predictedCostOverDue <= responseModel.getLimit().doubleValue())
+                        {
 
-                        //TODO: finish implementation
+                            singleElementSolution.add(idE2);
+                        }
+
+                        else {
+
+                            elementCombinedSolution.add(idE2);
+                        }
+
+
+                        /**
+                         * If all elements solve the budget issue compare usages
+                         */
+                        if(!singleElementSolution.isEmpty() && elementCombinedSolution.isEmpty()){
+
+                            // Compare usage with JSON data from Resource Storage
+                            // and return the instance id that has the least usages
+                        }
+
+                        else{
+
+                                //solve it with combined solution
+
+                            //TODO: finish implementation
+                        }
+
+
+
+
                     }
 
                 }
@@ -100,6 +153,8 @@ public class Ec2Resource {
 
     }
 
+
+
     /**
      * Returns the predicted cost of an EC2 instance sum
      * The EC2 instances shall hold data from an interval of 14 days
@@ -110,12 +165,14 @@ public class Ec2Resource {
      */
     private double GetPredictedCostForBudgetEndDate(double ec2InstanceSum, LocalDate endDate) {
 
+
+
         long daysLeftOfBudget = ChronoUnit.DAYS.between(LocalDate.now(), endDate);
 
-        // Based on the last 14 days
-        double dayCost = ec2InstanceSum / 14;
 
-        return dayCost * daysLeftOfBudget;
+        System.out.println((ec2InstanceSum) * daysLeftOfBudget);
+
+        return (ec2InstanceSum/14) * daysLeftOfBudget;
 
     }
 

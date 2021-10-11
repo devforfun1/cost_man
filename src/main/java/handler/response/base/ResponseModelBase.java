@@ -6,20 +6,20 @@ import java.time.LocalDateTime;
 
 public abstract class ResponseModelBase {
 
-    protected LocalDateTime ldt;
+    protected LocalDateTime timeOfResponse;
 
-    public ResponseModelBase(LocalDateTime ldt) {
-        this.ldt = ldt;
+    public ResponseModelBase(LocalDateTime timeOfResponse) {
+        this.timeOfResponse = timeOfResponse;
     }
 
-    public LocalDateTime getLdt() {
-        return ldt;
+    public LocalDateTime getTimeOfResponse() {
+        return timeOfResponse;
     }
 
     @Override
     public String toString() {
         return "ResponseBase{" +
-                "ldt="+ DateUtil.ConvertDateTime(ldt) +
+                "ldt="+ DateUtil.ConvertDateTime(timeOfResponse) +
                 '}';
     }
 }

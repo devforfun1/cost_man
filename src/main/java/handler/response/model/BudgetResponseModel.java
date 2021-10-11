@@ -3,6 +3,7 @@ package handler.response.model;
 import handler.response.base.ResponseModelBase;
 
 import java.math.BigDecimal;
+import java.math.MathContext;
 import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -53,11 +54,16 @@ public class BudgetResponseModel extends ResponseModelBase {
 
     public Double GetPercentageLeft(){
 
-     return amountUsed.divide(limit, RoundingMode.HALF_UP).doubleValue();
+        MathContext mathContext = new MathContext(5);
+
+     return amountUsed.divide(limit, mathContext).doubleValue();
     }
     public Double GetRemainingPercentage(){
 
-     return  1 - amountUsed.divide(limit, RoundingMode.HALF_UP).doubleValue();
+        System.out.println("GetPercentageLeft -> "+GetPercentageLeft());
+
+
+     return 1.0 - GetPercentageLeft();
     }
 
 
@@ -65,7 +71,7 @@ public class BudgetResponseModel extends ResponseModelBase {
     @Override
     public String toString() {
         return "BudgetResponse{" +
-                "ldt=" + ldt +
+                "ldt=" + timeOfResponse +
                 ", amountUsed=" + amountUsed +
                 ", limit=" + limit +
                 ", unit='" + unit + '\'' +
