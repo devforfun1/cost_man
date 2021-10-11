@@ -4,8 +4,10 @@ import Enum.priority.PriorityQueueType;
 import Enum.priority.ResourceGroupPriorities;
 import aws.api.request.cost_explorer.CostExplorerRequest;
 import aws.cli.AwsCLIRequest;
+import costman.Ec2Resource;
 import datastorage.ResourceStorage;
 import datastorage.db.PriorityService;
+import exception.BudgetNotSupportedException;
 import factory.priority.Producer;
 import factory.priority.ResourceGroupFactory;
 import handler.response.base.ResponseHandlerBase;
@@ -66,7 +68,7 @@ public class BudgetResponseHandler extends ResponseHandlerBase {
 
             if (queueElement == ResourceGroupPriorities.EC2) {
 
-                Ec2ResourceGroupOperation(BudgetStatus.OK,response);
+                Ec2ResourceGroupOperation(BudgetStatus.OK, response);
 
             }
 
@@ -84,9 +86,10 @@ public class BudgetResponseHandler extends ResponseHandlerBase {
 
             if (queueElement == ResourceGroupPriorities.EC2) {
 
-                Ec2ResourceGroupOperation(BudgetStatus.CLOSE_TO_LIMIT,response);
+                Ec2ResourceGroupOperation(BudgetStatus.CLOSE_TO_LIMIT, response);
 
-            }}
+            }
+        }
     }
 
     private void BudgetUrgent(BudgetResponseModel response) {
@@ -100,7 +103,7 @@ public class BudgetResponseHandler extends ResponseHandlerBase {
             if (queueElement == ResourceGroupPriorities.EC2) {
 
 
-                Ec2ResourceGroupOperation(BudgetStatus.URGENT,response);
+                Ec2ResourceGroupOperation(BudgetStatus.URGENT, response);
 
             } else if (queueElement == ResourceGroupPriorities.VPC) {
 
@@ -115,11 +118,12 @@ public class BudgetResponseHandler extends ResponseHandlerBase {
 
     private void BudgetOverDue(BudgetResponseModel response) {
 
-        //TODO: Not yet implemented
+        Ec2ResourceGroupOperation(BudgetStatus.OVER_DUE,response);
     }
 
     /**
      * Threshold values for different budget statuses
+     *
      * @param response
      * @return
      */
@@ -138,13 +142,9 @@ public class BudgetResponseHandler extends ResponseHandlerBase {
 
             if (percentage >= 0 && percentage <= 0.45) {
                 budgetStatus = BudgetStatus.OK;
-            }
-
-            else if(percentage > 0.45 && percentage <=0.70){
+            } else if (percentage > 0.45 && percentage <= 0.70) {
                 budgetStatus = BudgetStatus.LEVEL2;
-            }
-
-            else if (percentage > 0.70 && percentage <= 0.89) {
+            } else if (percentage > 0.70 && percentage <= 0.89) {
 
                 budgetStatus = BudgetStatus.CLOSE_TO_LIMIT;
             } else if (percentage >= 0.90 && percentage <= 1) {
@@ -158,6 +158,7 @@ public class BudgetResponseHandler extends ResponseHandlerBase {
 
     /**
      * Gets the selected priority policy from the repository
+     *
      * @return
      */
     private PriorityQueueType GetSelectedPriority() {
@@ -167,6 +168,7 @@ public class BudgetResponseHandler extends ResponseHandlerBase {
 
     /**
      * Gets the wrapper for the ResourceGroup Priority Queue
+     *
      * @return
      */
     private ResourceGroupPriority GetResourceGroupPriority() {
@@ -184,7 +186,7 @@ public class BudgetResponseHandler extends ResponseHandlerBase {
      *
      * @param status
      */
-    private void Ec2ResourceGroupOperation(BudgetStatus status,BudgetResponseModel response) {
+    private void Ec2ResourceGroupOperation(BudgetStatus status, BudgetResponseModel response) {
 
         ResourceStorage.getInstance().Ec2OperationRunning(true);
 
@@ -202,24 +204,25 @@ public class BudgetResponseHandler extends ResponseHandlerBase {
         if (status == BudgetStatus.OK) {
             ec2InstanceIds = ResourceStorage.getInstance().getEc2StoppedInstances();
             awsCLIRequest.StartEC2Instances(ec2InstanceIds);
-        }
+        } else if (status == BudgetStatus.CLOSE_TO_LIMIT) {
 
-        else if(status == BudgetStatus.CLOSE_TO_LIMIT){
-
+            Ec2Resource ec2Resource = new Ec2Resource();
 
             CostExplorerRequest ceRequest = new CostExplorerRequest();
             ec2InstanceIds = ResourceStorage.getInstance().getEc2RunningInstances();
 
             Dictionary<String, Ec2CeDataModel> ec2SumValesDict = ceRequest.GetEc2UsagesValueDict(ec2InstanceIds);
-            ec2InstanceIds.
-                    forEach( id -> System.out.println("id -> "+id +"\ncost -> "+ec2SumValesDict.get(id).getSummedPriced() +
-                    "\nSummed Usage -> " +ec2SumValesDict.get(id).getSummedUsageQuantity()));
 
-            //TODO: Finish implementation
+
+            try {
+                ec2Resource.CalculateEc2InstancesToShutdown(ec2SumValesDict, status, response);
+            } catch (BudgetNotSupportedException e) {
+                e.printStackTrace();
+            }
         }
 
         //Stops all running Ec2 instances
-        else if(status == BudgetStatus.URGENT) {
+        else if (status == BudgetStatus.URGENT || status == BudgetStatus.OVER_DUE) {
             ec2InstanceIds = ResourceStorage.getInstance().getEc2RunningInstances();
             awsCLIRequest.StopEC2Instances(ec2InstanceIds);
         }

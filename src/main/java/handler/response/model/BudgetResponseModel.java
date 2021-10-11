@@ -55,6 +55,10 @@ public class BudgetResponseModel extends ResponseModelBase {
 
      return amountUsed.divide(limit, RoundingMode.HALF_UP).doubleValue();
     }
+    public Double GetRemainingPercentage(){
+
+     return  1 - amountUsed.divide(limit, RoundingMode.HALF_UP).doubleValue();
+    }
 
 
 

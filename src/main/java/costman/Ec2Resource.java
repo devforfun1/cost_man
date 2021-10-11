@@ -1,6 +1,7 @@
 package costman;
 
 import Enum.budget.BudgetStatus;
+import aws.cli.AwsCLIRequest;
 import exception.BudgetNotSupportedException;
 import handler.response.model.BudgetResponseModel;
 import handler.response.model.Ec2CeDataModel;
@@ -15,11 +16,15 @@ import java.util.List;
 // Refactor class later ...
 public class Ec2Resource {
 
+    private AwsCLIRequest awsCLIRequest;
+
     public Ec2Resource() {
+
+        awsCLIRequest = new AwsCLIRequest();
     }
 
-    public List<String> CalculateEc2InstancesToShutdown (Dictionary<String, Ec2CeDataModel> ec2SumValesDict, BudgetStatus status,
-                                                         BudgetResponseModel responseModel) throws BudgetNotSupportedException {
+    public List<String> CalculateEc2InstancesToShutdown(Dictionary<String, Ec2CeDataModel> ec2SumValesDict, BudgetStatus status,
+                                                        BudgetResponseModel responseModel) throws BudgetNotSupportedException {
 
         List<String> instanceIdsToShutdown = null;
 
@@ -30,57 +35,87 @@ public class Ec2Resource {
             Enumeration<String> e = ec2SumValesDict.keys();
 
             String id;
-            double ec2InstancePortionOfBudget;
+            double ec2InstancePortionOfBudgetPercentage = 0;
+            double predictedPrice = 0;
 
-            if(status == BudgetStatus.CLOSE_TO_LIMIT){
+            if (status == BudgetStatus.CLOSE_TO_LIMIT) {
 
-            while (e.hasMoreElements()) {
+                while (e.hasMoreElements()) {
 
-                id = e.nextElement();
-
-                ec2InstancePortionOfBudget = GetPercentageOfBudget(responseModel,ec2SumValesDict.get(e).getSummedPriced());
-
+                    id = e.nextElement();
 
 
+                    System.out.println("id -> " + id + "\ncost -> " + ec2SumValesDict.get(id).getSummedPriced() +
+                            "\nSummed Usage -> " + ec2SumValesDict.get(id).getSummedUsageQuantity());
 
-                System.out.println("id -> " + id + "\ncost -> " + ec2SumValesDict.get(id).getSummedPriced() +
-                        "\nSummed Usage -> " + ec2SumValesDict.get(id).getSummedUsageQuantity());
+
+                    predictedPrice = predictedPrice + GetPredictedCostForBudgetEndDate(ec2SumValesDict.get(id).getSummedPriced(),
+                            responseModel.getEndDate());
+
+                }
+
+                Enumeration<String> e2 = ec2SumValesDict.keys();
+
+                double predictedEc2CostPercentage = GetPercentageOfBudget(responseModel, predictedPrice);
+                double mockPredictedEc2CostPercentage = 0.07;
+
+                System.out.println("percentage left of budget -> "+responseModel.GetRemainingPercentage());
+
+                if (mockPredictedEc2CostPercentage >= responseModel.GetRemainingPercentage()) {
+
+                    while (e2.hasMoreElements()) {
+                        instanceIdsToShutdown.add(e2.nextElement());
+                    }
+
+                    awsCLIRequest.StopEC2Instances(instanceIdsToShutdown);
+
+                } else {
+
+                    System.out.println("i");
+
+                    while (e2.hasMoreElements()) {
 
 
-                //TODO: Finish implementation
+
+                        //System.out.println("ec2 instance percentage -> " + GetPercentageOfBudget(responseModel,ec2SumValesDict.get(e2.nextElement()).getSummedPriced()));
+
+                        //TODO: finish implementation
+                    }
+
+                }
+
             }
-
-            }
-        }
-        else{
+        } else {
             throw new BudgetNotSupportedException(status.name());
         }
 
         return instanceIdsToShutdown;
     }
 
-private double GetPercentageOfBudget(BudgetResponseModel responseModel,double sum){
 
-        return sum/responseModel.getLimit().doubleValue();
+    private Double GetPercentageOfBudget(BudgetResponseModel responseModel, double sum) {
+
+        return sum / responseModel.getLimit().doubleValue();
 
 
-}
+    }
 
     /**
      * Returns the predicted cost of an EC2 instance sum
      * The EC2 instances shall hold data from an interval of 14 days
+     *
      * @param ec2InstanceSum
      * @param endDate
      * @return
      */
-    private double GetPredictedCostForBudgetEndDate(double ec2InstanceSum, LocalDate endDate){
+    private double GetPredictedCostForBudgetEndDate(double ec2InstanceSum, LocalDate endDate) {
 
-       long daysLeftOfBudget = ChronoUnit.DAYS.between(LocalDate.now(),endDate);
+        long daysLeftOfBudget = ChronoUnit.DAYS.between(LocalDate.now(), endDate);
 
-       // Based on the last 14 days
-       double dayCost = ec2InstanceSum / 14;
+        // Based on the last 14 days
+        double dayCost = ec2InstanceSum / 14;
 
-       return dayCost * daysLeftOfBudget;
+        return dayCost * daysLeftOfBudget;
 
     }
 
