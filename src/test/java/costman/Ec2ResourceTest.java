@@ -20,11 +20,10 @@ public class Ec2ResourceTest {
 
     private Dictionary<String, Ec2CeDataModel> ec2SumValesDict;
 
-
     private LocalDateTime timeOfResponse;
 
-
     private String unit;
+
 
     /**
      * Mock Model of important data from the response object from AWS budget API
@@ -44,7 +43,7 @@ public class Ec2ResourceTest {
         ec2Resource = new Ec2Resource();
     }
 
-    //@Test
+    @Test
     public void CalculateEc2InstancesToShutdown_CloseToLimit_Test() throws BudgetNotSupportedException {
 
         BigDecimal amountUsed = new BigDecimal(18);
@@ -68,7 +67,7 @@ public class Ec2ResourceTest {
         List<String> instanceIdsToShutdown = ec2Resource.CalculateEc2InstancesToShutdown(ec2SumValesDict,
                 BudgetStatus.CLOSE_TO_LIMIT, responseModelMock);
 
-        String expected = "ec2CeDataModel1_instance_id";
+        String expected = "ec2CeDataModel2_instance_id";
         String actual = instanceIdsToShutdown.get(0);
 
         Assert.assertEquals(expected, actual);
