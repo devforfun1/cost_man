@@ -44,7 +44,7 @@ public class Ec2ResourceTest {
     }
 
     @Test
-    public void CalculateEc2InstancesToShutdown_CloseToLimit_Test() throws BudgetNotSupportedException {
+    public void CalculateEc2InstancesToShutdown_CloseToLimit_SingleElementSolution_Test() throws BudgetNotSupportedException {
 
         BigDecimal amountUsed = new BigDecimal(18);
         BigDecimal limit =new BigDecimal(20);
@@ -52,7 +52,6 @@ public class Ec2ResourceTest {
         LocalDate startDate = LocalDate.now();
         LocalDate endDate =LocalDate.now().plusDays(16);
 
-        System.out.println("a"+amountUsed.doubleValue());
 
         responseModelMock = new BudgetResponseModel(timeOfResponse, amountUsed, limit, unit, startDate, endDate);
 
@@ -71,6 +70,50 @@ public class Ec2ResourceTest {
         String actual = instanceIdsToShutdown.get(0);
 
         Assert.assertEquals(expected, actual);
+
+    }
+
+    @Test
+    public void CalculateEc2InstancesToShutdown_CloseToLimit_CombinedElementSolution_Test() throws BudgetNotSupportedException {
+
+        BigDecimal amountUsed = new BigDecimal(18);
+        BigDecimal limit =new BigDecimal(20);
+
+        LocalDate startDate = LocalDate.now();
+        LocalDate endDate =LocalDate.now().plusDays(16);
+
+
+        responseModelMock = new BudgetResponseModel(timeOfResponse, amountUsed, limit, unit, startDate, endDate);
+
+        Ec2CeDataModel ec2CeDataModel1 = new Ec2CeDataModel(10, 1);
+        Ec2CeDataModel ec2CeDataModel2 = new Ec2CeDataModel(20, 0.5);
+        Ec2CeDataModel ec2CeDataModel3 = new Ec2CeDataModel(30, 0.5);
+        Ec2CeDataModel ec2CeDataModel4 = new Ec2CeDataModel(40, 0.5);
+
+
+
+
+        ec2SumValesDict.put("ec2CeDataModel1_instance_id", ec2CeDataModel1);
+        ec2SumValesDict.put("ec2CeDataModel2_instance_id", ec2CeDataModel2);
+        ec2SumValesDict.put("ec2CeDataModel3_instance_id", ec2CeDataModel3);
+        ec2SumValesDict.put("ec2CeDataModel4_instance_id", ec2CeDataModel4);
+
+
+        List<String> instanceIdsToShutdown = ec2Resource.CalculateEc2InstancesToShutdown(ec2SumValesDict,
+                BudgetStatus.CLOSE_TO_LIMIT, responseModelMock);
+
+        String[] expectedEc2InstanceIds ={"ec2CeDataModel1_instance_id","ec2CeDataModel2_instance_id"};
+
+       boolean actual = false;
+
+        if(instanceIdsToShutdown.size() == 2){
+
+            if(instanceIdsToShutdown.contains(expectedEc2InstanceIds[0]) && instanceIdsToShutdown.contains(expectedEc2InstanceIds[1]))
+                actual = true;
+        }
+
+
+        Assert.assertTrue(actual);
 
     }
 }
