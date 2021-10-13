@@ -5,6 +5,7 @@ import Enum.budget.BudgetStatus;
 import exception.BudgetNotSupportedException;
 import handler.response.model.BudgetResponseModel;
 import handler.response.model.Ec2CeDataModel;
+import tool.ListTool;
 
 
 import java.time.LocalDate;
@@ -20,6 +21,15 @@ public class Ec2Resource {
 
     }
 
+    /**
+     * Calculate ec2 instances to shut down bases on budget,usages and price
+     * @param ec2SumValuesDict
+     * @param status
+     * @param responseModel
+     * @return
+     * @throws BudgetNotSupportedException
+     */
+
     public List<String> CalculateEc2InstancesToShutdown(Dictionary<String, Ec2CeDataModel> ec2SumValuesDict, BudgetStatus status,
                                                         BudgetResponseModel responseModel) throws BudgetNotSupportedException {
         List<String> instanceIdsToShutdown;
@@ -29,8 +39,6 @@ public class Ec2Resource {
             instanceIdsToShutdown = new ArrayList<>();
 
             Enumeration<String> e = ec2SumValuesDict.keys();
-
-            //System.out.println("budgetResponseModel -> " + responseModel.toString());
 
             String id;
             double ec2InstancePortionOfBudgetPercentage = 0;
@@ -67,46 +75,14 @@ public class Ec2Resource {
                     System.out.println("Predicted cost overdue -> " + predictedCostOverDue);
 
                     /**
-                     * List that contains elements in e2 enumeration that will solve the budget issue on its own
+                     * Create unions of possible solutions and compare their usage
                      */
-                    List<String> singleElementSolution = new ArrayList<>();
-                    /**
-                     *  Elements in e2 enumeration that doesn't solve the budget issue on its own
-                     */
-                    List<String> elementCombinedSolution = new ArrayList<>();
-
-                    while (e2.hasMoreElements()) {
-
-                        String idE2 = e2.nextElement();
 
 
-                        if (predictedCostDict.get(idE2) >= predictedCostOverDue)
-                            singleElementSolution.add(idE2);
-                        else
-                            elementCombinedSolution.add(idE2);
-                    }
-
-                    /**
-                     * If all elements solve the budget issue by themselves,  compare their usages and-
-                     * -return the least used ec2 instance id
-                     */
-                    if (!singleElementSolution.isEmpty() && elementCombinedSolution.isEmpty()) {
-
-                        System.out.println("in single");
-                        instanceIdsToShutdown.add(SingleElementSolution(ec2SumValuesDict));
-
-                    } else {
-
-                        /**
-                         * Create unions of possible solutions and compare their usage
-                         */
-
-                        System.out.println("in else");
-                        instanceIdsToShutdown = CombinedElementSolution(ec2SumValuesDict, predictedCostDict,
-                                predictedCostOverDue);
+                    instanceIdsToShutdown = CombinedElementSolution(ec2SumValuesDict, predictedCostDict,
+                            predictedCostOverDue);
 
 
-                    }
                     return instanceIdsToShutdown;
                 }
 
@@ -119,13 +95,11 @@ public class Ec2Resource {
         return instanceIdsToShutdown;
     }
 
-
     private Double GetPercentageOfBudget(BudgetResponseModel responseModel, double sum) {
 
         return sum / responseModel.getLimit().doubleValue();
 
     }
-
 
     /**
      * Returns the predicted cost of an EC2 instance sum
@@ -146,85 +120,118 @@ public class Ec2Resource {
 
     /**
      * Compare usages sum and return the instance id of the least used ec2
-     *
      * @param ec2SumValuesDict
+     * @param predictedCostDict
+     * @param predictedCostOverDue
      * @return
      */
-    private String SingleElementSolution(Dictionary<String, Ec2CeDataModel> ec2SumValuesDict) {
-
-        String selectedId = "";
-        double usageQuantitySum = 0;
-
-        Enumeration<String> e = ec2SumValuesDict.keys();
-
-        while (e.hasMoreElements()) {
-
-            String id = e.nextElement();
-
-            if (ec2SumValuesDict.get(id).getSummedUsageQuantity() > usageQuantitySum) {
-
-                selectedId = id;
-                // System.out.println("selected id: singleElementSolution -> " + selectedId);
-            }
-
-            usageQuantitySum = ec2SumValuesDict.get(id).getSummedUsageQuantity();
-            //System.out.println("Usage quantitySum : singleElementSolution -> " + usageQuantitySum);
-        }
-
-        return selectedId;
-
-    }
-
     private List<String> CombinedElementSolution(Dictionary<String, Ec2CeDataModel> ec2SumValuesDict, Dictionary<String, Double> predictedCostDict,
                                                  double predictedCostOverDue) {
 
+        /**
+         *  So the execution time will be reasonable
+         */
+        if (ec2SumValuesDict.size() < 7) {
 
-        List<List<String>> unionsCombinedSolutionsList = new ArrayList<>();
+            return CombinedElementSolutionRecursive(ec2SumValuesDict, predictedCostDict, predictedCostOverDue);
+        } else {
 
-        List<String> combinedSolution = null;
+            List<List<String>> unionsCombinedSolutionsList = new ArrayList<>();
 
-        List<String> ec2InstanceIds = Collections.list(ec2SumValuesDict.keys());
+            List<String> combinedSolution = null;
 
-        String enumerationId;
+            List<String> ec2InstanceIds = Collections.list(ec2SumValuesDict.keys());
 
-        for (String ec2Id : ec2InstanceIds) {
+            String enumerationId;
+
+            for (String ec2Id : ec2InstanceIds) {
 
 
-            Enumeration<String> e = ec2SumValuesDict.keys();
-
-            enumerationId = e.nextElement();
-
-            while (e.hasMoreElements()) {
-
-                System.out.println((predictedCostDict.get(ec2Id) + predictedCostDict.get(enumerationId)) >= predictedCostOverDue);
-
-                if ((predictedCostDict.get(ec2Id) + predictedCostDict.get(enumerationId)) >= predictedCostOverDue) {
-
-                    combinedSolution = new ArrayList<>();
-
-                    if (!ec2Id.matches(enumerationId)) {
-                        combinedSolution.add(ec2Id);
-                        combinedSolution.add(enumerationId);
-
-                    }
-                }
+                Enumeration<String> e = ec2SumValuesDict.keys();
 
                 enumerationId = e.nextElement();
+
+                while (e.hasMoreElements()) {
+
+                    System.out.println((predictedCostDict.get(ec2Id) + predictedCostDict.get(enumerationId)) >= predictedCostOverDue);
+
+                    if ((predictedCostDict.get(ec2Id) + predictedCostDict.get(enumerationId)) >= predictedCostOverDue) {
+
+                        combinedSolution = new ArrayList<>();
+
+                        if (!ec2Id.matches(enumerationId)) {
+                            combinedSolution.add(ec2Id);
+                            combinedSolution.add(enumerationId);
+
+                        }
+                    }
+
+                    enumerationId = e.nextElement();
+                }
+                if (!combinedSolution.isEmpty())
+                    unionsCombinedSolutionsList.add(combinedSolution);
             }
-            if (!combinedSolution.isEmpty())
-                unionsCombinedSolutionsList.add(combinedSolution);
+
+            return GetLeastUsedCombination(unionsCombinedSolutionsList, ec2SumValuesDict);
         }
-
-        //TODO: finish implementation
-
-        return GetLeastUsedCombination(unionsCombinedSolutionsList, ec2SumValuesDict);
 
     }
 
+    /**
+     * 1.Makes a call to a recursive method that finds the unique combinations and returns them into a List
+     * 2. Check possible combinations that won't break budget and adds them to the OK list
+     * 3.Invokes a method to GetLeastUsedCombination
+     * @param ec2SumValuesDict
+     * @param predictedCostDict
+     * @param predictedCostOverDue
+     * @return
+     */
+    private List<String> CombinedElementSolutionRecursive(Dictionary<String, Ec2CeDataModel> ec2SumValuesDict, Dictionary<String, Double> predictedCostDict,
+                                                          double predictedCostOverDue) {
 
+        ListTool<String> listTool = new ListTool<>();
+
+        List<String> ec2InstanceIds = Collections.list(ec2SumValuesDict.keys());
+
+        List<List<String>> resultList = new ArrayList<>();
+
+        List<List<String>> unionsCombinedSolutionsList = listTool.FindAllCombinationsWithUniqueElements
+                (ec2InstanceIds, ec2InstanceIds.size(), resultList);
+
+
+        List<List<String>> combinedSolutionCostOk = new ArrayList<>();
+
+        double combinationCostSum;
+
+        for (List<String> combinationList : unionsCombinedSolutionsList) {
+
+            combinationCostSum = 0;
+
+            for (String ec2InstanceId : combinationList) {
+
+                combinationCostSum = combinationCostSum + predictedCostDict.get(ec2InstanceId);
+            }
+
+            if (combinationCostSum >= predictedCostOverDue) {
+
+                combinedSolutionCostOk.add(combinationList);
+            }
+        }
+
+        return GetLeastUsedCombination(combinedSolutionCostOk, ec2SumValuesDict);
+    }
+
+
+
+    /**
+     * Get the least used combination (including combinations of single elements)
+     *
+     * @param unionsCombinedSolutionsList
+     * @param ec2SumValuesDict
+     * @return
+     */
     private List<String> GetLeastUsedCombination(List<List<String>> unionsCombinedSolutionsList,
                                                  Dictionary<String, Ec2CeDataModel> ec2SumValuesDict) {
-
 
         List<String> selectedList = null;
 
@@ -261,5 +268,6 @@ public class Ec2Resource {
 
         return selectedList;
     }
+
 
 }

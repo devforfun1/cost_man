@@ -43,6 +43,10 @@ public class Ec2ResourceTest {
         ec2Resource = new Ec2Resource();
     }
 
+    /** Both instances cost the same but ec2CeDataModel2_instance_id has lesser usage
+     *
+     * @throws BudgetNotSupportedException
+     */
     @Test
     public void CalculateEc2InstancesToShutdown_CloseToLimit_SingleElementSolution_Test() throws BudgetNotSupportedException {
 
@@ -55,8 +59,8 @@ public class Ec2ResourceTest {
 
         responseModelMock = new BudgetResponseModel(timeOfResponse, amountUsed, limit, unit, startDate, endDate);
 
-        Ec2CeDataModel ec2CeDataModel1 = new Ec2CeDataModel(130, 1.5);
-        Ec2CeDataModel ec2CeDataModel2 = new Ec2CeDataModel(150, 0.8);
+        Ec2CeDataModel ec2CeDataModel1 = new Ec2CeDataModel(130, 2);
+        Ec2CeDataModel ec2CeDataModel2 = new Ec2CeDataModel(10, 2);
 
 
         ec2SumValesDict.put("ec2CeDataModel1_instance_id", ec2CeDataModel1);
@@ -73,7 +77,51 @@ public class Ec2ResourceTest {
 
     }
 
+    /**
+     * Even though ec2CeDataModel4 has high usages it's the only instance that won't break budget
+     * @throws BudgetNotSupportedException
+     */
+
     @Test
+    public void CalculateEc2InstancesToShutdown_CloseToLimit_SingleElementSolution2_Test() throws BudgetNotSupportedException {
+
+        BigDecimal amountUsed = new BigDecimal(18);
+        BigDecimal limit =new BigDecimal(20);
+
+        LocalDate startDate = LocalDate.now();
+        LocalDate endDate =LocalDate.now().plusDays(16);
+
+
+        responseModelMock = new BudgetResponseModel(timeOfResponse, amountUsed, limit, unit, startDate, endDate);
+
+        Ec2CeDataModel ec2CeDataModel1 = new Ec2CeDataModel(10, 0.5);
+        Ec2CeDataModel ec2CeDataModel2 = new Ec2CeDataModel(50, 0.5);
+        Ec2CeDataModel ec2CeDataModel3 = new Ec2CeDataModel(30, 0.5);
+        Ec2CeDataModel ec2CeDataModel4 = new Ec2CeDataModel(40, 3);
+
+
+        ec2SumValesDict.put("ec2CeDataModel1_instance_id", ec2CeDataModel1);
+        ec2SumValesDict.put("ec2CeDataModel2_instance_id", ec2CeDataModel2);
+        ec2SumValesDict.put("ec2CeDataModel3_instance_id", ec2CeDataModel3);
+        ec2SumValesDict.put("ec2CeDataModel4_instance_id", ec2CeDataModel4);
+
+        List<String> instanceIdsToShutdown = ec2Resource.CalculateEc2InstancesToShutdown(ec2SumValesDict,
+                BudgetStatus.CLOSE_TO_LIMIT, responseModelMock);
+
+        String expected ="ec2CeDataModel4_instance_id";
+
+        String  actual = instanceIdsToShutdown.get(0);
+
+        Assert.assertEquals(expected,actual);
+    }
+
+    /**
+     * Predicted budget will only be met by if one of the two instances with cost 3$ shuts down
+     * Usage won't matter in this case
+     * @throws BudgetNotSupportedException
+     */
+
+   @Test
     public void CalculateEc2InstancesToShutdown_CloseToLimit_CombinedElementSolution_Test() throws BudgetNotSupportedException {
 
         BigDecimal amountUsed = new BigDecimal(18);
@@ -85,11 +133,10 @@ public class Ec2ResourceTest {
 
         responseModelMock = new BudgetResponseModel(timeOfResponse, amountUsed, limit, unit, startDate, endDate);
 
-        Ec2CeDataModel ec2CeDataModel1 = new Ec2CeDataModel(10, 1);
-        Ec2CeDataModel ec2CeDataModel2 = new Ec2CeDataModel(20, 0.5);
-        Ec2CeDataModel ec2CeDataModel3 = new Ec2CeDataModel(30, 0.5);
-        Ec2CeDataModel ec2CeDataModel4 = new Ec2CeDataModel(40, 0.5);
-
+        Ec2CeDataModel ec2CeDataModel1 = new Ec2CeDataModel(10, 3);
+        Ec2CeDataModel ec2CeDataModel2 = new Ec2CeDataModel(20, 3);
+        Ec2CeDataModel ec2CeDataModel3 = new Ec2CeDataModel(30, 0.1);
+        Ec2CeDataModel ec2CeDataModel4 = new Ec2CeDataModel(40, 0.1);
 
 
 
@@ -104,6 +151,10 @@ public class Ec2ResourceTest {
 
         String[] expectedEc2InstanceIds ={"ec2CeDataModel1_instance_id","ec2CeDataModel2_instance_id"};
 
+
+        System.out.println("instance id size "+instanceIdsToShutdown.size());
+
+    instanceIdsToShutdown.forEach(i -> System.out.println("instance ids test 3 -> "+i));
        boolean actual = false;
 
         if(instanceIdsToShutdown.size() == 2){
