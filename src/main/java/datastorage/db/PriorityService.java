@@ -67,7 +67,7 @@ public class PriorityService {
 
    public List<PriorityQueuePlaceModel> GetPriorityQueuePlaces(Integer queueId) {
 
-        final String sql = "SELECT pe.data AS element_data,pe.element_type AS element_type" +
+        final String sql = "SELECT pe.data AS element_data,pe.element_type AS element_type," +
                 " qp.* FROM Prio_Queue pq JOIN Prio_Queue_Place qp ON pq.id = qp.queue_id JOIN Prio_Element pe ON pe.id = qp.element_id WHERE pq.id=?;";
         PreparedStatement ps = null;
 
