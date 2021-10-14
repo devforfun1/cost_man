@@ -4,6 +4,7 @@ import Enum.priority.PriorityQueueType;
 import Enum.priority.ResourceType;
 import aws.api.request.cost_explorer.CostExplorerRequest;
 import aws.cli.AwsCLIRequest;
+
 import costman.Ec2ResourceGroup;
 import datastorage.ResourceStorage;
 import datastorage.db.PriorityService;
@@ -18,6 +19,7 @@ import handler.response.model.Ec2CeDataModel;
 import priority.ResourceGroupPriority;
 import priority.ResourcePriority;
 import priority.model.ResourcePriorityQueueElement;
+
 
 
 import java.util.Dictionary;
@@ -72,32 +74,10 @@ public class BudgetResponseHandler extends ResponseHandlerBase {
             if (queueElement == ResourceType.EC2) {
 
                 Ec2ResourceGroupOperation(BudgetStatus.OK, response);
-
             }
 
         } else if (queueType == PriorityQueueType.RESOURCE_IDS) {
-
-            ResourcePriorityFactory factory = (ResourcePriorityFactory) Producer.GetFactory();
-
-            ResourcePriority resourcePriority = factory.Create();
-
-            Queue<ResourcePriorityQueueElement> queue = resourcePriority.getPriorityQueue();
-
-            ResourcePriorityQueueElement queueElement;
-
-            while (!queue.isEmpty()) {
-                System.out.println("in queue loop");
-                queueElement = queue.poll();
-
-                if (queueElement.getResourceType() == ResourceType.EC2) {
-                    // Start all
-
-                    // TODO:  Add to list and use group method instead
-                    awsCLIRequest.StartEC2Instance(queueElement.getInstanceId());
-                }
-
-            }
-
+            ResourceQueuePriorityLoop(BudgetStatus.OK,response);
         }
 
     }
@@ -118,7 +98,7 @@ public class BudgetResponseHandler extends ResponseHandlerBase {
             }
         } else if (queueType == PriorityQueueType.RESOURCE_IDS) {
 
-            ResourcePriority resourcePriority = GetResourcePriority();
+
 
             //TODO: Finish implementation
 
@@ -148,6 +128,7 @@ public class BudgetResponseHandler extends ResponseHandlerBase {
                 //TODO: Not yet implemented
             }
         } else if (queueType == PriorityQueueType.RESOURCE_IDS) {
+                    ResourceQueuePriorityLoop(BudgetStatus.URGENT,response);
         } else {
         }
 
@@ -234,28 +215,35 @@ public class BudgetResponseHandler extends ResponseHandlerBase {
         return factory.Create();
     }
 
-    /**
-     * Start or stops EC2 instances based on the budget status and their previous state
-     * This method should only be used when resource priority is used
-     * The Resource Group operation uses ec2 instance ids from the local environment
-     *
-     * @param status
-     */
-    private void Ec2ResourceOperation(BudgetStatus status, BudgetResponseModel response, Queue<ResourcePriorityQueueElement> instanceIdQueue) {
+    private void ResourceQueuePriorityLoop(BudgetStatus status, BudgetResponseModel response){
 
-        //TODO: Finish implementation
+        ResourcePriority resourcePriority = GetResourcePriority();
 
-        if (status == BudgetStatus.OK) {
+        Queue<ResourcePriorityQueueElement> queue = resourcePriority.getPriorityQueue();
 
+        ResourcePriorityQueueElement queueElement;
+
+
+        while (!queue.isEmpty()) {
+            System.out.println("in queue loop");
+            queueElement = queue.poll();
+
+            if (queueElement.getResourceType() == ResourceType.EC2) {
+
+                if(status == BudgetStatus.OK)
+                    awsCLIRequest.StartEC2Instance(queueElement.getInstanceId());
+
+                else if(status == BudgetStatus.URGENT || status == BudgetStatus.OVER_DUE)
+                    awsCLIRequest.StopEC2Instance(queueElement.getInstanceId());
+
+                else if(status == BudgetStatus.CLOSE_TO_LIMIT){}
+
+
+            }
 
         }
-
-        if (status == BudgetStatus.CLOSE_TO_LIMIT) {
-
-        }
-
-
     }
+
 
     /**
      * Start or stops EC2 instances based on the budget status and their previous state
