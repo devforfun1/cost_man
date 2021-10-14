@@ -75,23 +75,31 @@ public class BudgetResponseHandler extends ResponseHandlerBase {
 
             }
 
+        } else if (queueType == PriorityQueueType.RESOURCE_IDS) {
+
+            ResourcePriorityFactory factory = (ResourcePriorityFactory) Producer.GetFactory();
+
+            ResourcePriority resourcePriority = factory.Create();
+
+            Queue<ResourcePriorityQueueElement> queue = resourcePriority.getPriorityQueue();
+
+            ResourcePriorityQueueElement queueElement;
+
+            while (!queue.isEmpty()) {
+                System.out.println("in queue loop");
+                queueElement = queue.poll();
+
+                if (queueElement.getResourceType() == ResourceType.EC2) {
+                    // Start all
+
+                    // TODO:  Add to list and use group method instead
+                    awsCLIRequest.StartEC2Instance(queueElement.getInstanceId());
+                }
+
+            }
+
         }
 
-        else if (queueType == PriorityQueueType.RESOURCE_IDS) {
-
-            ResourcePriority resourcePriority = new ResourcePriority();
-
-            Queue<ResourcePriorityQueueElement> queue =  resourcePriority.getPriorityQueue();
-
-
-
-                //TODO: Finish implementation
-
-
-        }
-
-        else {
-        }
     }
 
 
@@ -153,8 +161,7 @@ public class BudgetResponseHandler extends ResponseHandlerBase {
         if (queueType == PriorityQueueType.RESOURCE_GROUPS) {
 
             //TODO: Finish implementation
-        }
-        else if (queueType == PriorityQueueType.RESOURCE_IDS) {
+        } else if (queueType == PriorityQueueType.RESOURCE_IDS) {
 
             //TODO: Finish implementation
         } else {
@@ -215,32 +222,37 @@ public class BudgetResponseHandler extends ResponseHandlerBase {
 
         ResourceGroupFactory factory = (ResourceGroupFactory) Producer.GetFactory();
 
-       return factory.Create();
+        return factory.Create();
 
 
     }
 
-    private ResourcePriority GetResourcePriority(){
+    private ResourcePriority GetResourcePriority() {
 
         ResourcePriorityFactory factory = (ResourcePriorityFactory) Producer.GetFactory();
 
         return factory.Create();
     }
 
-    private void Ec2ResourceOperation(BudgetStatus status, BudgetResponseModel response, Queue<String> instanceIdQueue){
+    /**
+     * Start or stops EC2 instances based on the budget status and their previous state
+     * This method should only be used when resource priority is used
+     * The Resource Group operation uses ec2 instance ids from the local environment
+     *
+     * @param status
+     */
+    private void Ec2ResourceOperation(BudgetStatus status, BudgetResponseModel response, Queue<ResourcePriorityQueueElement> instanceIdQueue) {
 
         //TODO: Finish implementation
 
-       if(status == BudgetStatus.OK){
+        if (status == BudgetStatus.OK) {
 
-
-       }
-
-        if(status == BudgetStatus.CLOSE_TO_LIMIT){
 
         }
 
+        if (status == BudgetStatus.CLOSE_TO_LIMIT) {
 
+        }
 
 
     }
@@ -248,6 +260,7 @@ public class BudgetResponseHandler extends ResponseHandlerBase {
     /**
      * Start or stops EC2 instances based on the budget status and their previous state
      * This method should only be used when resource group priority is used
+     * The Resource Group operation uses ec2 instance ids from AWS
      *
      * @param status
      */

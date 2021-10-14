@@ -17,6 +17,7 @@ public class ResourcePriorityFactory extends PriorityFactory implements Factory<
     void InitFactory() {
 
         queueModel = priorityService.GetSelectedPriorityQueue();
+        queueModel.setQueuePlace(priorityService.GetPriorityQueuePlaces(queueModel.getId()));
     }
 
 
@@ -29,6 +30,8 @@ public class ResourcePriorityFactory extends PriorityFactory implements Factory<
 
         PriorityQueuePlaceModel firstPrio = queueModel.getPriorityQueuePlaces().stream().filter(e -> e.getParentId() == 0).findFirst().get();
 
+        priorityQueue.add(new ResourcePriorityQueueElement(firstPrio.getElementData(),ConvertElementType(firstPrio.getElementType())));
+
 
 
         PriorityQueuePlaceModel curr = firstPrio;
@@ -36,7 +39,7 @@ public class ResourcePriorityFactory extends PriorityFactory implements Factory<
         for (int i = 0; i < queueModel.getPriorityQueuePlaces().size(); i++) {
 
 
-            if (curr.getParentId() != 0)
+            if (curr.getParentId() != 0 )
                 priorityQueue.add(new ResourcePriorityQueueElement(curr.getElementData(),ConvertElementType(curr.getElementType())));
 
             PriorityQueuePlaceModel finalCurr = curr;
