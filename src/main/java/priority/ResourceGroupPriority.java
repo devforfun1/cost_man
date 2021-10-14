@@ -1,12 +1,12 @@
 package priority;
 
 import Enum.priority.PriorityQueueType;
-import Enum.priority.ResourceGroupPriorities;
+import Enum.priority.ResourceType;
 import factory.priority.PriorityType;
 
 import java.util.Queue;
 
-public class ResourceGroupPriority extends PriorityBase<ResourceGroupPriorities> implements PriorityType {
+public class ResourceGroupPriority extends PriorityBase<ResourceType> implements PriorityType {
 
 
     public ResourceGroupPriority() {
@@ -20,7 +20,7 @@ public class ResourceGroupPriority extends PriorityBase<ResourceGroupPriorities>
     }
 
 
-    public void SetQueue(Queue<ResourceGroupPriorities> priorityQueue) {
+    public void SetQueue(Queue<ResourceType> priorityQueue) {
 
         this.setPriorityQueue(priorityQueue);
     }

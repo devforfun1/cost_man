@@ -67,7 +67,8 @@ public class PriorityService {
 
    public List<PriorityQueuePlaceModel> GetPriorityQueuePlaces(Integer queueId) {
 
-        final String sql = "SELECT qp.* FROM Prio_Queue pq JOIN Prio_Queue_Place qp ON pq.id = qp.queue_id WHERE pq.id=?;";
+        final String sql = "SELECT pe.data AS element_data,pe.element_type AS element_type" +
+                " qp.* FROM Prio_Queue pq JOIN Prio_Queue_Place qp ON pq.id = qp.queue_id JOIN Prio_Element pe ON pe.id = qp.element_id WHERE pq.id=?;";
         PreparedStatement ps = null;
 
 
@@ -75,6 +76,9 @@ public class PriorityService {
         List<PriorityQueuePlaceModel> queuePlaces = new LinkedList<>();
 
         int elementId = 0;
+        int elementType;
+        String elementData = "";
+
 
         try {
             ps = DBConnection.getInstance().Connect().prepareStatement(sql);
@@ -88,8 +92,10 @@ public class PriorityService {
             while (rs.next()) {
 
                 elementId = rs.getInt("element_id");
+                elementType = rs.getInt("element_type");
+                elementData = rs.getString("element_data");
 
-                tmp = new PriorityQueuePlaceModel(elementId);
+                tmp = new PriorityQueuePlaceModel(elementId,elementData,elementType);
 
                 if (rs.getInt("child_element_id") != 0)
                     tmp.setChildId(rs.getInt("child_element_id"));

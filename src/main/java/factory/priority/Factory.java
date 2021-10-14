@@ -1,6 +1,8 @@
 package factory.priority;
 
-public interface Factory<T> {
+import priority.PriorityBase;
+
+public interface Factory<T extends PriorityBase> {
 
     T Create();
 

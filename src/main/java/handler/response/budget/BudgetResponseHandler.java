@@ -1,25 +1,28 @@
 package handler.response.budget;
 
 import Enum.priority.PriorityQueueType;
-import Enum.priority.ResourceGroupPriorities;
+import Enum.priority.ResourceType;
 import aws.api.request.cost_explorer.CostExplorerRequest;
 import aws.cli.AwsCLIRequest;
-import costman.Ec2Resource;
+import costman.Ec2ResourceGroup;
 import datastorage.ResourceStorage;
 import datastorage.db.PriorityService;
 import exception.BudgetNotSupportedException;
 import factory.priority.Producer;
 import factory.priority.ResourceGroupFactory;
+import factory.priority.ResourcePriorityFactory;
 import handler.response.base.ResponseHandlerBase;
 import handler.response.model.BudgetResponseModel;
 import Enum.budget.BudgetStatus;
 import handler.response.model.Ec2CeDataModel;
 import priority.ResourceGroupPriority;
-import software.amazon.awssdk.services.budgets.model.BudgetsResponse;
+import priority.ResourcePriority;
+import priority.model.ResourcePriorityQueueElement;
 
 
 import java.util.Dictionary;
 import java.util.List;
+import java.util.Queue;
 
 
 public class BudgetResponseHandler extends ResponseHandlerBase {
@@ -64,14 +67,28 @@ public class BudgetResponseHandler extends ResponseHandlerBase {
 
         if (queueType == PriorityQueueType.RESOURCE_GROUPS) {
 
-            ResourceGroupPriorities queueElement = GetResourceGroupPriority().getPriorityQueue().poll();
+            ResourceType queueElement = GetResourceGroupPriority().getPriorityQueue().poll();
 
-            if (queueElement == ResourceGroupPriorities.EC2) {
+            if (queueElement == ResourceType.EC2) {
 
                 Ec2ResourceGroupOperation(BudgetStatus.OK, response);
 
             }
 
+        }
+
+        else if (queueType == PriorityQueueType.RESOURCE_IDS) {
+
+            ResourcePriority resourcePriority = new ResourcePriority();
+
+            Queue<ResourcePriorityQueueElement> queue =  resourcePriority.getPriorityQueue();
+
+                //TODO: Finish implementation
+
+
+        }
+
+        else {
         }
     }
 
@@ -82,13 +99,21 @@ public class BudgetResponseHandler extends ResponseHandlerBase {
 
         if (queueType == PriorityQueueType.RESOURCE_GROUPS) {
 
-            ResourceGroupPriorities queueElement = GetResourceGroupPriority().getPriorityQueue().poll();
+            ResourceType queueElement = GetResourceGroupPriority().getPriorityQueue().poll();
 
-            if (queueElement == ResourceGroupPriorities.EC2) {
+            if (queueElement == ResourceType.EC2) {
 
                 Ec2ResourceGroupOperation(BudgetStatus.CLOSE_TO_LIMIT, response);
 
             }
+        } else if (queueType == PriorityQueueType.RESOURCE_IDS) {
+
+            ResourcePriority resourcePriority = GetResourcePriority();
+
+            //TODO: Finish implementation
+
+
+        } else {
         }
     }
 
@@ -99,26 +124,39 @@ public class BudgetResponseHandler extends ResponseHandlerBase {
         if (queueType == PriorityQueueType.RESOURCE_GROUPS) {
 
 
-            ResourceGroupPriorities queueElement = GetResourceGroupPriority().getPriorityQueue().poll();
-            if (queueElement == ResourceGroupPriorities.EC2) {
+            ResourceType queueElement = GetResourceGroupPriority().getPriorityQueue().poll();
+            if (queueElement == ResourceType.EC2) {
 
 
                 Ec2ResourceGroupOperation(BudgetStatus.URGENT, response);
 
-            } else if (queueElement == ResourceGroupPriorities.VPC) {
+            } else if (queueElement == ResourceType.VPC) {
 
                 //TODO: Not yet implemented
-            } else if (queueElement == ResourceGroupPriorities.EKS) {
+            } else if (queueElement == ResourceType.EKS) {
 
                 //TODO: Not yet implemented
             }
+        } else if (queueType == PriorityQueueType.RESOURCE_IDS) {
+        } else {
         }
 
     }
 
     private void BudgetOverDue(BudgetResponseModel response) {
 
-        Ec2ResourceGroupOperation(BudgetStatus.OVER_DUE,response);
+        PriorityQueueType queueType = GetSelectedPriority();
+
+        Ec2ResourceGroupOperation(BudgetStatus.OVER_DUE, response);
+        if (queueType == PriorityQueueType.RESOURCE_GROUPS) {
+
+            //TODO: Finish implementation
+        }
+        else if (queueType == PriorityQueueType.RESOURCE_IDS) {
+
+            //TODO: Finish implementation
+        } else {
+        }
     }
 
     /**
@@ -175,9 +213,34 @@ public class BudgetResponseHandler extends ResponseHandlerBase {
 
         ResourceGroupFactory factory = (ResourceGroupFactory) Producer.GetFactory();
 
-        ResourceGroupPriority rg = factory.Create();
+       return factory.Create();
 
-        return rg;
+
+    }
+
+    private ResourcePriority GetResourcePriority(){
+
+        ResourcePriorityFactory factory = (ResourcePriorityFactory) Producer.GetFactory();
+
+        return factory.Create();
+    }
+
+    private void Ec2ResourceOperation(BudgetStatus status, BudgetResponseModel response, Queue<String> instanceIdQueue){
+
+        //TODO: Finish implementation
+
+       if(status == BudgetStatus.OK){
+
+
+       }
+
+        if(status == BudgetStatus.CLOSE_TO_LIMIT){
+
+        }
+
+
+
+
     }
 
     /**
@@ -206,7 +269,7 @@ public class BudgetResponseHandler extends ResponseHandlerBase {
             awsCLIRequest.StartEC2Instances(ec2InstanceIds);
         } else if (status == BudgetStatus.CLOSE_TO_LIMIT) {
 
-            Ec2Resource ec2Resource = new Ec2Resource();
+            Ec2ResourceGroup ec2ResourceGroup = new Ec2ResourceGroup();
 
             CostExplorerRequest ceRequest = new CostExplorerRequest();
             ec2InstanceIds = ResourceStorage.getInstance().getEc2RunningInstances();
@@ -215,7 +278,10 @@ public class BudgetResponseHandler extends ResponseHandlerBase {
 
 
             try {
-                ec2Resource.CalculateEc2InstancesToShutdown(ec2SumValesDict, status, response);
+
+                ec2InstanceIds = ec2ResourceGroup.CalculateEc2InstancesToShutdown(ec2SumValesDict, status, response);
+                awsCLIRequest.StopEC2Instances(ec2InstanceIds);
+
             } catch (BudgetNotSupportedException e) {
                 e.printStackTrace();
             }

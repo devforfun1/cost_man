@@ -1,7 +1,7 @@
 package factory.priority;
 
 
-import Enum.priority.ResourceGroupPriorities;
+import Enum.priority.ResourceType;
 import datastorage.db.model.PriorityQueuePlaceModel;
 
 import priority.ResourceGroupPriority;
@@ -10,6 +10,7 @@ import priority.ResourceGroupPriority;
 import java.util.LinkedList;
 
 import java.util.Queue;
+
 
 
 public class ResourceGroupFactory extends PriorityFactory implements Factory<ResourceGroupPriority> {
@@ -34,7 +35,7 @@ public class ResourceGroupFactory extends PriorityFactory implements Factory<Res
         ResourceGroupPriority resourceGroupPriority = new ResourceGroupPriority();
 
 
-        Queue<ResourceGroupPriorities> priorityQueue = new LinkedList<>();
+        Queue<ResourceType> priorityQueue = new LinkedList<>();
 
         PriorityQueuePlaceModel firstPrio = queueModel.getPriorityQueuePlaces().stream().filter(e -> e.getParentId() == 0).findFirst().get();
 
@@ -65,14 +66,14 @@ public class ResourceGroupFactory extends PriorityFactory implements Factory<Res
      * @param id
      * @return
      */
-    private ResourceGroupPriorities Convert(int id) {
+    private ResourceType Convert(int id) {
 
         if (id == 1)
-            return ResourceGroupPriorities.EC2;
+            return ResourceType.EC2;
         else if (id == 2)
-            return ResourceGroupPriorities.VPC;
+            return ResourceType.VPC;
         else if (id == 3)
-            return ResourceGroupPriorities.EKS;
+            return ResourceType.EKS;
 
         else
             return null;
