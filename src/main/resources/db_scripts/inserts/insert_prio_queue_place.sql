@@ -5,4 +5,13 @@ INSERT INTO Prio_Queue_Place(queue_id,element_id,child_element_id,parent_element
 VALUES(1,3,2,1);
 
 INSERT INTO Prio_Queue_Place(queue_id,element_id,parent_element_id)
-VALUES(1,2,3)
+VALUES(1,2,3);
+
+INSERT INTO Prio_Queue_Place(queue_id,element_id,child_element_id)
+VALUES(2,5,5);
+
+INSERT INTO Prio_Queue_Place(queue_id,element_id,parent_element_id)
+VALUES(2,4,4);
+
+
+

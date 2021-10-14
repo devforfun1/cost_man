@@ -83,6 +83,8 @@ public class BudgetResponseHandler extends ResponseHandlerBase {
 
             Queue<ResourcePriorityQueueElement> queue =  resourcePriority.getPriorityQueue();
 
+
+
                 //TODO: Finish implementation
 
 

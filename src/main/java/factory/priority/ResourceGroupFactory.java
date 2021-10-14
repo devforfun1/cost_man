@@ -39,7 +39,7 @@ public class ResourceGroupFactory extends PriorityFactory implements Factory<Res
 
         PriorityQueuePlaceModel firstPrio = queueModel.getPriorityQueuePlaces().stream().filter(e -> e.getParentId() == 0).findFirst().get();
 
-        priorityQueue.add(Convert(firstPrio.getElementId()));
+        priorityQueue.add(ConvertElementData(firstPrio.getElementId()));
 
         PriorityQueuePlaceModel curr = firstPrio;
 
@@ -47,7 +47,7 @@ public class ResourceGroupFactory extends PriorityFactory implements Factory<Res
 
 
             if (curr.getParentId() != 0)
-                priorityQueue.add(Convert(curr.getElementId()));
+                priorityQueue.add(ConvertElementData(curr.getElementId()));
 
             PriorityQueuePlaceModel finalCurr = curr;
 
@@ -66,7 +66,7 @@ public class ResourceGroupFactory extends PriorityFactory implements Factory<Res
      * @param id
      * @return
      */
-    private ResourceType Convert(int id) {
+    private ResourceType ConvertElementData(int id) {
 
         if (id == 1)
             return ResourceType.EC2;
