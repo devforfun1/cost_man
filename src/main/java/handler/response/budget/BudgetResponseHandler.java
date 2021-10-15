@@ -5,7 +5,7 @@ import Enum.priority.ResourceType;
 import aws.api.request.cost_explorer.CostExplorerRequest;
 import aws.cli.AwsCLIRequest;
 
-import costman.Ec2ResourceGroup;
+import costman.Ec2ResourceTool;
 import datastorage.ResourceStorage;
 import datastorage.db.PriorityService;
 import exception.BudgetNotSupportedException;
@@ -21,7 +21,7 @@ import priority.ResourcePriority;
 import priority.model.ResourcePriorityQueueElement;
 
 
-
+import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.List;
 import java.util.Queue;
@@ -32,11 +32,17 @@ public class BudgetResponseHandler extends ResponseHandlerBase {
     private PriorityService priorityService;
     private AwsCLIRequest awsCLIRequest;
 
+    private Ec2ResourceTool ec2ResourceTool;
+    private CostExplorerRequest ceRequest;
 
     public BudgetResponseHandler() {
 
         priorityService = new PriorityService();
         awsCLIRequest = new AwsCLIRequest();
+
+        ec2ResourceTool = new Ec2ResourceTool();
+        ceRequest = new CostExplorerRequest();
+
     }
 
     public void HandleBudgetResponse(BudgetResponseModel response) {
@@ -77,7 +83,7 @@ public class BudgetResponseHandler extends ResponseHandlerBase {
             }
 
         } else if (queueType == PriorityQueueType.RESOURCE_IDS) {
-            ResourceQueuePriorityLoop(BudgetStatus.OK,response);
+            ResourceQueuePriorityLoop(BudgetStatus.OK, response);
         }
 
     }
@@ -97,13 +103,8 @@ public class BudgetResponseHandler extends ResponseHandlerBase {
 
             }
         } else if (queueType == PriorityQueueType.RESOURCE_IDS) {
+            ResourceQueuePriorityLoop(BudgetStatus.CLOSE_TO_LIMIT, response);
 
-
-
-            //TODO: Finish implementation
-
-
-        } else {
         }
     }
 
@@ -128,7 +129,7 @@ public class BudgetResponseHandler extends ResponseHandlerBase {
                 //TODO: Not yet implemented
             }
         } else if (queueType == PriorityQueueType.RESOURCE_IDS) {
-                    ResourceQueuePriorityLoop(BudgetStatus.URGENT,response);
+            ResourceQueuePriorityLoop(BudgetStatus.URGENT, response);
         } else {
         }
 
@@ -215,7 +216,7 @@ public class BudgetResponseHandler extends ResponseHandlerBase {
         return factory.Create();
     }
 
-    private void ResourceQueuePriorityLoop(BudgetStatus status, BudgetResponseModel response){
+    private void ResourceQueuePriorityLoop(BudgetStatus status, BudgetResponseModel response) {
 
         ResourcePriority resourcePriority = GetResourcePriority();
 
@@ -223,23 +224,44 @@ public class BudgetResponseHandler extends ResponseHandlerBase {
 
         ResourcePriorityQueueElement queueElement;
 
+        List<String> ec2Ids = new ArrayList<>();
 
         while (!queue.isEmpty()) {
-            System.out.println("in queue loop");
+
             queueElement = queue.poll();
 
             if (queueElement.getResourceType() == ResourceType.EC2) {
 
-                if(status == BudgetStatus.OK)
+
+                if (status == BudgetStatus.OK)
                     awsCLIRequest.StartEC2Instance(queueElement.getInstanceId());
 
-                else if(status == BudgetStatus.URGENT || status == BudgetStatus.OVER_DUE)
+                else if (status == BudgetStatus.URGENT || status == BudgetStatus.OVER_DUE)
                     awsCLIRequest.StopEC2Instance(queueElement.getInstanceId());
 
-                else if(status == BudgetStatus.CLOSE_TO_LIMIT){}
+                else if (status == BudgetStatus.CLOSE_TO_LIMIT) {
+                    ec2Ids.add(queueElement.getInstanceId());
+                }
 
 
             }
+
+        }
+
+        if (status == BudgetStatus.CLOSE_TO_LIMIT && !ec2Ids.isEmpty()) {
+
+            ResourceStorage.getInstance().Ec2OperationRunning(true);
+
+            // Sets EC2 information data in ResourceStorage (Singleton)
+
+            awsCLIRequest.GetEC2InstancesInfoByIds(ec2Ids);
+
+            while (ResourceStorage.getInstance().IsEc2OperationRunning()) {
+
+                // wait for thread in awsCLIRequest.GetEC2Data() to finish
+            }
+
+            Ec2CloseToLimitExecution(status,response);
 
         }
     }
@@ -257,7 +279,7 @@ public class BudgetResponseHandler extends ResponseHandlerBase {
         ResourceStorage.getInstance().Ec2OperationRunning(true);
 
         // Sets EC2 information data in ResourceStorage (Singleton)
-        awsCLIRequest.GetEC2Data();
+        awsCLIRequest.GetEC2InstanceInfo();
 
         while (ResourceStorage.getInstance().IsEc2OperationRunning()) {
 
@@ -271,23 +293,7 @@ public class BudgetResponseHandler extends ResponseHandlerBase {
             ec2InstanceIds = ResourceStorage.getInstance().getEc2StoppedInstances();
             awsCLIRequest.StartEC2Instances(ec2InstanceIds);
         } else if (status == BudgetStatus.CLOSE_TO_LIMIT) {
-
-            Ec2ResourceGroup ec2ResourceGroup = new Ec2ResourceGroup();
-
-            CostExplorerRequest ceRequest = new CostExplorerRequest();
-            ec2InstanceIds = ResourceStorage.getInstance().getEc2RunningInstances();
-
-            Dictionary<String, Ec2CeDataModel> ec2SumValesDict = ceRequest.GetEc2UsagesValueDict(ec2InstanceIds);
-
-
-            try {
-
-                ec2InstanceIds = ec2ResourceGroup.CalculateEc2InstancesToShutdown(ec2SumValesDict, status, response);
-                awsCLIRequest.StopEC2Instances(ec2InstanceIds);
-
-            } catch (BudgetNotSupportedException e) {
-                e.printStackTrace();
-            }
+            Ec2CloseToLimitExecution(status,response);
         }
 
         //Stops all running Ec2 instances
@@ -297,6 +303,22 @@ public class BudgetResponseHandler extends ResponseHandlerBase {
         }
 
         ResourceStorage.getInstance().ClearLists();
+    }
+
+    private void Ec2CloseToLimitExecution(BudgetStatus status, BudgetResponseModel response) {
+
+        List<String> ec2InstanceIds = ResourceStorage.getInstance().getEc2RunningInstances();
+
+        Dictionary<String, Ec2CeDataModel> ec2SumValesDict = ceRequest.GetEc2UsagesValueDict(ec2InstanceIds);
+
+        try {
+
+            ec2InstanceIds = ec2ResourceTool.CalculateEc2InstancesToShutdown(ec2SumValesDict, status, response);
+            awsCLIRequest.StopEC2Instances(ec2InstanceIds);
+
+        } catch (BudgetNotSupportedException e) {
+            e.printStackTrace();
+        }
     }
 
 }

@@ -13,10 +13,10 @@ import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 
-public class Ec2ResourceGroup {
+public class Ec2ResourceTool {
 
 
-    public Ec2ResourceGroup() {
+    public Ec2ResourceTool() {
 
 
     }

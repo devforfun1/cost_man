@@ -16,7 +16,7 @@ import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.List;
 
-public class Ec2ResourceGroupTest {
+public class Ec2ResourceToolGroupTest {
 
     private Dictionary<String, Ec2CeDataModel> ec2SumValesDict;
 
@@ -30,7 +30,7 @@ public class Ec2ResourceGroupTest {
      */
     private BudgetResponseModel responseModelMock;
 
-    private Ec2ResourceGroup ec2ResourceGroup;
+    private Ec2ResourceTool ec2ResourceTool;
 
     @Before
     public void Init() {
@@ -40,7 +40,7 @@ public class Ec2ResourceGroupTest {
         timeOfResponse = LocalDateTime.of(2021, 9, 15, 8, 0);
         unit = "usd";
 
-        ec2ResourceGroup = new Ec2ResourceGroup();
+        ec2ResourceTool = new Ec2ResourceTool();
     }
 
     /** Both instances cost the same but ec2CeDataModel2_instance_id has lesser usage
@@ -67,7 +67,7 @@ public class Ec2ResourceGroupTest {
         ec2SumValesDict.put("ec2CeDataModel2_instance_id", ec2CeDataModel2);
 
 
-        List<String> instanceIdsToShutdown = ec2ResourceGroup.CalculateEc2InstancesToShutdown(ec2SumValesDict,
+        List<String> instanceIdsToShutdown = ec2ResourceTool.CalculateEc2InstancesToShutdown(ec2SumValesDict,
                 BudgetStatus.CLOSE_TO_LIMIT, responseModelMock);
 
         String expected = "ec2CeDataModel2_instance_id";
@@ -105,7 +105,7 @@ public class Ec2ResourceGroupTest {
         ec2SumValesDict.put("ec2CeDataModel3_instance_id", ec2CeDataModel3);
         ec2SumValesDict.put("ec2CeDataModel4_instance_id", ec2CeDataModel4);
 
-        List<String> instanceIdsToShutdown = ec2ResourceGroup.CalculateEc2InstancesToShutdown(ec2SumValesDict,
+        List<String> instanceIdsToShutdown = ec2ResourceTool.CalculateEc2InstancesToShutdown(ec2SumValesDict,
                 BudgetStatus.CLOSE_TO_LIMIT, responseModelMock);
 
         String expected ="ec2CeDataModel4_instance_id";
@@ -146,7 +146,7 @@ public class Ec2ResourceGroupTest {
         ec2SumValesDict.put("ec2CeDataModel4_instance_id", ec2CeDataModel4);
 
 
-        List<String> instanceIdsToShutdown = ec2ResourceGroup.CalculateEc2InstancesToShutdown(ec2SumValesDict,
+        List<String> instanceIdsToShutdown = ec2ResourceTool.CalculateEc2InstancesToShutdown(ec2SumValesDict,
                 BudgetStatus.CLOSE_TO_LIMIT, responseModelMock);
 
         String[] expectedEc2InstanceIds ={"ec2CeDataModel1_instance_id","ec2CeDataModel2_instance_id"};

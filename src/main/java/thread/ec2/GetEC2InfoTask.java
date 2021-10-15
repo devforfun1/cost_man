@@ -16,8 +16,31 @@ import thread.base.ShellScriptTask;
 public class GetEC2InfoTask extends ShellScriptTask implements Runnable {
 
 
+    /**
+     * Use when instance ids are unknown
+     * @param scriptName
+     */
     public GetEC2InfoTask(String scriptName) {
         super(scriptName);
+    }
+
+    /**
+     * Use when instance ids are known
+     * @param scriptName
+     * @param ec2InstanceIds
+     */
+    public GetEC2InfoTask(String scriptName, String[] ec2InstanceIds) {
+        super(scriptName, ec2InstanceIds);
+    }
+
+    /**
+     * Use when instance ids are known
+     * Instances ids are separated with " " (space)
+     * @param scriptName
+     * @param ec2InstanceIdString
+     */
+    public GetEC2InfoTask(String scriptName, String ec2InstanceIdString) {
+        super(scriptName, new String[]{ec2InstanceIdString});
     }
 
     @Override

@@ -1,5 +1,6 @@
 package aws.cli;
 
+import datastorage.ResourceStorage;
 import thread.ec2.GetEC2InfoTask;
 import thread.ec2.StartEC2InstanceTask;
 import thread.ec2.StopEC2InstanceTask;
@@ -13,24 +14,47 @@ import java.util.concurrent.ThreadPoolExecutor;
 
 public class AwsCLIRequest {
 
-    private final String EC2_DATA_SCRIPT_NAME = "ec2List.sh";
+    private final String EC2_GET_INSTANCE_INFO_SCRIPT_NAME = "ec2GetInstanceInfo.sh";
+    private final String EC2_GET_INSTANCE_INFO_BY_ID_SCRIPT_NAME = "ec2GetInstanceInfoById.sh";
     private final String EC2_STOP_INSTANCE_SCRIPT_NAME = "ec2StopInstance.sh";
     private final String EC2_Start_INSTANCE_SCRIPT_NAME = "ec2StartInstance.sh";
+
 
     public AwsCLIRequest() {
     }
 
-    public void GetEC2Data() {
+    public void GetEC2InstanceInfo() {
 
         ExecutorService executor = Executors.newSingleThreadExecutor();
 
-        executor.execute(new GetEC2InfoTask(EC2_DATA_SCRIPT_NAME));
+
+        ResourceStorage.getInstance().Ec2OperationRunning(true);
+
+
+
+
+        executor.execute(new GetEC2InfoTask(EC2_GET_INSTANCE_INFO_SCRIPT_NAME));
 
         executor.shutdown();
 
     }
 
-    public void StopEC2Instance(String instanceId) {
+    public void  GetEC2InstancesInfoByIds(List<String> ec2InstanceIDs) {
+
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+
+        StringBuilder sb = new StringBuilder();
+
+        ec2InstanceIDs.forEach(id -> sb.append(id + " "));
+
+        executor.execute(new GetEC2InfoTask(EC2_GET_INSTANCE_INFO_BY_ID_SCRIPT_NAME,sb.toString().trim()));
+
+        executor.shutdown();
+
+    }
+
+
+        public void StopEC2Instance(String instanceId) {
 
         ExecutorService executor = Executors.newSingleThreadExecutor();
 

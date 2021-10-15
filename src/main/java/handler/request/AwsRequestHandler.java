@@ -100,7 +100,7 @@ public class AwsRequestHandler {
 
     private void GetEC2Data() {
 
-        awsCLIRequest.GetEC2Data();
+        awsCLIRequest.GetEC2InstanceInfo();
 
     }
 
